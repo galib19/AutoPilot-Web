@@ -6,12 +6,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-          All Cases
+          All Tickets
           <!-- <small></small> -->
         </h1>
         <ol class="breadcrumb">
           <li><i class="fa fa-dashboard"></i> <a href="#">Dashboard</a></li>
-          <li class="active">Cases</li>
+          <li class="active">Tickets</li>
         </ol>
         
     </section>
@@ -49,10 +49,10 @@
               <table class="table table-bordered table-condesed">
                 <thead>
                     <tr>
-                      <th style="width: 80px;">Case ID</th>
+                      <th style="width: 80px;">Ticker ID</th>
                       <th>Title</th>
                       <th style="width: 180px;">Created By</th>
-                      <th style="width: 100px;">Case Status</th>
+                      <th style="width: 100px;">Ticket Status</th>
                       <th style="width: 180px;">Date</th>
                       <th>Action</th>
                     </tr>

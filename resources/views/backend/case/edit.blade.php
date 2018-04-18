@@ -6,12 +6,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-          Edit Case
+          Edit Ticket
           <!-- <small>Cases</small> -->
         </h1>
         <ol class="breadcrumb">
           <li><i class="fa fa-dashboard"></i> <a href="#">Dashboard</a></li>
-          <li class="active">Cases</li>
+          <li class="active">Tickets</li>
         </ol>
 
         <div class="panel-body">

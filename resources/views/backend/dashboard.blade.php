@@ -36,7 +36,7 @@
             <!-- /.box-header -->
             <div class="box-body ">
                   <h3><span style="font-weight: 400;">Hello</span> {{ Auth::user()->name }}</h3>
-                  <p class="lead text-muted">Welcome to ASF - Incedent Management App</p>
+                  <p class="lead text-muted">Welcome to Quick Force</p>
 
                   <!-- <h4>Get started</h4>
                   <p><a href="#" class="btn btn-primary">Write your first blog post</a> </p> -->

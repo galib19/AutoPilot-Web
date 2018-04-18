@@ -15,10 +15,10 @@ class UsersTableDataSeeder extends Seeder
 
     	DB::table('users')->insert([
             [
-            	'name' => 'Super Admin',
-            	'phone' => '01674752564',
+            	'name' => 'Admin',
+            	'phone' => '01612345678',
             	'email' => 'r.chowdhury@brainstation-23.com',
-            	'password' => bcrypt('Abc@123'),
+            	'password' => bcrypt('123456789'),
             	'active' => 1
             ],
             [

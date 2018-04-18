@@ -19,20 +19,20 @@ class RolesTableSeeder extends Seeder
         //Create super admin role
         $super_admin = new Role();
         $super_admin->name = 'super_admin';
-        $super_admin->display_name = 'Super Admin';
+        $super_admin->display_name = 'Admin';
         $super_admin->save();
 
 
         //Create admin role
         $admin = new Role();
         $admin->name = 'admin';
-        $admin->display_name = 'Admin';
+        $admin->display_name = 'Manager';
         $admin->save();
 
         //Create Fact Finding role
         $fact_finding = new Role();
         $fact_finding->name = 'fact_finding';
-        $fact_finding->display_name = 'Fact Finding';
+        $fact_finding->display_name = 'Engineer';
         $fact_finding->save();
 
 
@@ -46,7 +46,7 @@ class RolesTableSeeder extends Seeder
         //Create Field Agent role
         $field_agent = new Role();
         $field_agent->name = 'field_agent';
-        $field_agent->display_name = 'Field Agent';
+        $field_agent->display_name = 'Client';
         $field_agent->save();
 
 

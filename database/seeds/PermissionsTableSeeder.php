@@ -225,12 +225,12 @@ class PermissionsTableSeeder extends Seeder
 
     		// users
     		$Users_index,
-    		$Users_create,
-    		$Users_store,
-    		$Users_edit,
-    		$Users_update,
+    		// $Users_create,
+    		// $Users_store,
+    		// $Users_edit,
+    		// $Users_update,
     		$Users_show,
-    		$Users_destroy,
+    		//$Users_destroy,
 
     		// Settings
     		$Settings_index,
@@ -241,8 +241,8 @@ class PermissionsTableSeeder extends Seeder
     		$CaseIncedent_index,
     		//$CaseIncedent_create,
     		//$CaseIncedent_store,
-    		$CaseIncedent_edit,
-    		$CaseIncedent_update,
+    		//$CaseIncedent_edit,
+    		//$CaseIncedent_update,
     		$CaseIncedent_show,
     		//$CaseIncedent_destroy,
     		//$CaseIncedent_CaseInfoUpdateHd,

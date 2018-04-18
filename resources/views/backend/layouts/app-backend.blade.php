@@ -109,7 +109,7 @@
             <div class="pull-right hidden-xs">
                 Developed by Brainstation-23.com
             </div>
-            Copyright &copy; {{ date('Y') }} <strong>Acid Survivors Foundation</strong> All rights reserved.
+            Copyright &copy; {{ date('Y') }} <strong>Brain Station 23</strong> All rights reserved.
         </footer>
 
         
