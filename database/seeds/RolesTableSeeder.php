@@ -16,66 +16,66 @@ class RolesTableSeeder extends Seeder
     {
     	DB::table('roles')->truncate();
 
-        //Create super admin role
-        $super_admin = new Role();
-        $super_admin->name = 'super_admin';
-        $super_admin->display_name = 'Admin';
-        $super_admin->save();
-
-
-        //Create admin role
+        //Create super manager role
         $admin = new Role();
         $admin->name = 'admin';
-        $admin->display_name = 'Manager';
+        $admin->display_name = 'Admin';
         $admin->save();
 
+
+        //Create manager role
+        $manager = new Role();
+        $manager->name = 'manager';
+        $manager->display_name = 'Manager';
+        $manager->save();
+
         //Create Fact Finding role
-        $fact_finding = new Role();
-        $fact_finding->name = 'fact_finding';
-        $fact_finding->display_name = 'Engineer';
-        $fact_finding->save();
+        $engineer = new Role();
+        $engineer->name = 'engineer';
+        $engineer->display_name = 'Engineer';
+        $engineer->save();
 
 
-        //Create Fact Finding role
-        $help_desk = new Role();
-        $help_desk->name = 'help_desk';
-        $help_desk->display_name = 'Help Desk';
-        $help_desk->save();
+        // //Create Fact Finding role
+        // $help_desk = new Role();
+        // $help_desk->name = 'help_desk';
+        // $help_desk->display_name = 'Help Desk';
+        // $help_desk->save();
 
 
         //Create Field Agent role
-        $field_agent = new Role();
-        $field_agent->name = 'field_agent';
-        $field_agent->display_name = 'Client';
-        $field_agent->save();
+        $client = new Role();
+        $client->name = 'client';
+        $client->display_name = 'Client';
+        $client->save();
 
 
-        // Attach Role for super admin
+        // Attach Role for super manager
         $user1 = User::find(1);
-        $user1->detachRole($super_admin);
-        $user1->attachRole($super_admin);
+        $user1->detachRole($admin);
+        $user1->attachRole($admin);
 
 
-        // Attach Role for admin
+        // Attach Role for manager
         $user2 = User::find(2);
-        $user2->detachRole($admin);
-        $user2->attachRole($admin);
+        $user2->detachRole($manager);
+        $user2->attachRole($manager);
 
         // Attach Role for Field agent
         $user3 = User::find(3);
-        $user3->detachRole($field_agent);
-        $user3->attachRole($field_agent);
+        $user3->detachRole($client);
+        $user3->attachRole($client);
 
 
         // Attach Role for Help desk team
         $user4 = User::find(4);
-        $user4->detachRole($help_desk);
-        $user4->attachRole($help_desk);
+        $user4->detachRole($engineer);
+        $user4->attachRole($engineer);
 
         // Attach Role for Fact finding team
         $user5 = User::find(5);
-        $user5->detachRole($fact_finding);
-        $user5->attachRole($fact_finding);
+        $user5->detachRole($engineer);
+        $user5->attachRole($engineer);
 
 
     }
