@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         //$this->call(UsersTableDataSeeder::class);
         //$this->call(CaseIncedentTableDataSeeder::class);
         //$this->call(CaseVictimTableDataSeeder::class);
-        $this->call(RolesTableSeeder::class);
+        //$this->call(RolesTableSeeder::class);
         $this->call(PermissionsTableSeeder::class);
 
         // To only apply to a single connection and reset it's self

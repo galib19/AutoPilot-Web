@@ -88,7 +88,7 @@ Route::group( ['prefix' => 'backend', 'as' => 'backend.', 'namespace' => 'Backen
 
     // case change status
     Route::post('case/changestatus/{id}', 'CaseIncedentController@CaseChangeStatus')->name('case.change.status');
-    Route::post('case/changestatusadmin/{id}', 'CaseIncedentController@CaseChangeStatusAdmin')->name('case.change.statusadmin');
+    Route::post('case/changestatusmanager/{id}', 'CaseIncedentController@CaseChangeStatusManager')->name('case.change.statusmanager');
 
 
   

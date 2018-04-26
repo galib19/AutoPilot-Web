@@ -82,9 +82,9 @@ class PermissionsTableSeeder extends Seeder
     	$CaseIncedent_CaseChangeStatus->save();
 
     	// mark as archive case
-    	$CaseIncedent_CaseChangeStatusAdmin = new Permission();
-    	$CaseIncedent_CaseChangeStatusAdmin->name = 'CaseIncedent_CaseChangeStatusAdmin';
-    	$CaseIncedent_CaseChangeStatusAdmin->save();
+    	$CaseIncedent_CaseChangeStatusManager = new Permission();
+    	$CaseIncedent_CaseChangeStatusManager->name = 'CaseIncedent_CaseChangeStatusManager';
+    	$CaseIncedent_CaseChangeStatusManager->save();
 
    
     	
@@ -143,7 +143,6 @@ class PermissionsTableSeeder extends Seeder
     	$admin = Role::whereName('admin')->first();
     	$manager = Role::whereName('manager')->first();
     	$engineer = Role::whereName('engineer')->first();
-    	//$help_desk = Role::whereName('help_desk')->first();
     	$client = Role::whereName('client')->first();
 
 
@@ -153,7 +152,7 @@ class PermissionsTableSeeder extends Seeder
     		$CaseIncedent_store,
     		$CaseIncedent_index,
     		$CaseIncedent_CaseChangeStatus,
-    		$CaseIncedent_CaseChangeStatusAdmin,
+    		$CaseIncedent_CaseChangeStatusManager,
     		$CaseIncedent_create,
     		$CaseIncedent_CaseInfoUpdateAdmin,
     		$CaseIncedent_CaseInfoUpdateFF,
@@ -173,9 +172,8 @@ class PermissionsTableSeeder extends Seeder
     	];
 
     	$admin->detachPermissions($all_permissions);
-    	$manager->detachPermissions($all_permissions);
-    	$engineer->detachPermissions($all_permissions);
-    	//$help_desk->detachPermissions($all_permissions);
+		$manager->detachPermissions($all_permissions);
+		$engineer->detachPermissions($all_permissions);
     	$client->detachPermissions($all_permissions);
 
     	
@@ -188,12 +186,12 @@ class PermissionsTableSeeder extends Seeder
     		$CaseIncedent_edit,
     		$CaseIncedent_update,
     		$CaseIncedent_show,
-    		$CaseIncedent_destroy,
+    		//$CaseIncedent_destroy,
     		$CaseIncedent_CaseInfoUpdateHd,
     		$CaseIncedent_CaseInfoUpdateFF,
     		$CaseIncedent_CaseInfoUpdateAdmin,
     		$CaseIncedent_CaseChangeStatus,
-    		$CaseIncedent_CaseChangeStatusAdmin,
+    		$CaseIncedent_CaseChangeStatusManager,
 
     		// users
     		$Users_index,
@@ -211,17 +209,17 @@ class PermissionsTableSeeder extends Seeder
 
     	$manager->attachPermissions([
     		$CaseIncedent_index,
-    		$CaseIncedent_create,
-    		$CaseIncedent_store,
-    		$CaseIncedent_edit,
-    		$CaseIncedent_update,
+    		//$CaseIncedent_create,
+    		//$CaseIncedent_store,
+    		//$CaseIncedent_edit,
+    		//$CaseIncedent_update,
     		$CaseIncedent_show,
-    		$CaseIncedent_destroy,
+    		//$CaseIncedent_destroy,
     		//$CaseIncedent_CaseInfoUpdateHd,
     		//$CaseIncedent_CaseInfoUpdateFF,
     		$CaseIncedent_CaseInfoUpdateAdmin,
     		//$CaseIncedent_CaseChangeStatus,
-    		$CaseIncedent_CaseChangeStatusAdmin,
+    		$CaseIncedent_CaseChangeStatusManager,
 
     		// users
     		$Users_index,
@@ -249,7 +247,7 @@ class PermissionsTableSeeder extends Seeder
     		$CaseIncedent_CaseInfoUpdateFF,
     		//$CaseIncedent_CaseInfoUpdateAdmin,
     		$CaseIncedent_CaseChangeStatus,
-    		//$CaseIncedent_CaseChangeStatusAdmin,
+    		//$CaseIncedent_CaseChangeStatusManager,
 
     		// users
     		//$Users_index,
@@ -264,46 +262,19 @@ class PermissionsTableSeeder extends Seeder
     		//$Settings_index,
     	]);
 
-    	// $help_desk->attachPermissions([
-    	// 	$CaseIncedent_index,
-    	// 	//$CaseIncedent_create,
-    	// 	//$CaseIncedent_store,
-    	// 	$CaseIncedent_edit,
-    	// 	$CaseIncedent_update,
-    	// 	$CaseIncedent_show,
-    	// 	//$CaseIncedent_destroy,
-    	// 	$CaseIncedent_CaseInfoUpdateHd,
-    	// 	//$CaseIncedent_CaseInfoUpdateFF,
-    	// 	//$CaseIncedent_CaseInfoUpdateAdmin,
-    	// 	$CaseIncedent_CaseChangeStatus,
-    	// 	//$CaseIncedent_CaseChangeStatusAdmin,
-
-    	// 	// users
-    	// 	// $Users_index,
-    	// 	// $Users_create,
-    	// 	// $Users_store,
-    	// 	// $Users_edit,
-    	// 	// $Users_update,
-    	// 	// $Users_show,
-    	// 	// $Users_destroy,
-
-    	// 	// Settings
-    	// 	//$Settings_index,
-    	// ]);
-
     	$client->attachPermissions([
     		$CaseIncedent_index,
     		$CaseIncedent_create,
     		$CaseIncedent_store,
-    		//$CaseIncedent_edit,
-    		//$CaseIncedent_update,
+    		$CaseIncedent_edit,
+    		$CaseIncedent_update,
     		$CaseIncedent_show,
     		//$CaseIncedent_destroy,
     		//$CaseIncedent_CaseInfoUpdateHd,
     		//$CaseIncedent_CaseInfoUpdateFF,
     		//$CaseIncedent_CaseInfoUpdateAdmin,
-    		//$CaseIncedent_CaseChangeStatus,
-    		//$CaseIncedent_CaseChangeStatusAdmin,
+    		// $CaseIncedent_CaseChangeStatus,
+    		//$CaseIncedent_CaseChangeStatusManager,
 
     		// users
     		// $Users_index,

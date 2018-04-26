@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class CaseIncedent extends Model
 {
     protected $fillable = [
-        'case_title', 'case_details', 'case_status', 'case_type', 'action_taken', 'incident_date',
+        'case_title', 'case_details', 'case_status', 'case_type', 'action_taken', 'incident_date'
     ];
 
 

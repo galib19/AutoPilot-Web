@@ -61,10 +61,11 @@ class CaseIncedentController extends BackendController
     {
         //
     	$cases = CaseIncedent::orderBy('id', 'DESC')->with('user')->latest()->paginate($this->limit);
-
+		$user = Auth::guard('web')->user();
+		
     	//dd($cases);
 
-        return view('backend.case.index',compact('cases'))->with('i', (request()->input('page', 1) - 1) * 5);
+        return view('backend.case.index',compact('cases','user'))->with('i', (request()->input('page', 1) - 1) * 5);
         //return view('backend.case.index');
     }
 
@@ -97,7 +98,7 @@ class CaseIncedentController extends BackendController
 
     	$data = $request->user()->cases()->create($data);
 
-    	$data_victim = $this->handleVictimRequest($request, $data->id);
+    	//$data_victim = $this->handleVictimRequest($request, $data->id);
 
 
     	if( isset($data_victim) && !empty($data_victim) ){
@@ -113,44 +114,9 @@ class CaseIncedentController extends BackendController
     	}
 
     	
-    	//dd($other_fields);
-
-    	//$case_meta->name = $request->name;
-
-    	// foreach ($other_fields as $value) {
-
-    	// 	$case_meta->case_id = $value['case_id'];
-    	// 	$case_meta->user_id = $value['user_id'];
-    	// 	$case_meta->meta_key = $value['meta_key'];
-    	// 	$case_meta->meta_value = $value['meta_value'];
-
-    	// }
-
-    	// $case_meta->save();
-
-    	//dd($case_meta);
-
-
-    	
-
-    	//dd($other_field);
-
-    	// DB::table('case_meta')->insert(array(
-    	// 	array('case_id' => '1', 'user_id' => '1', 'meta_key' => 'meta_value'),
-    	// 	array('case_id' => '2', 'user_id' => '2', 'meta_key' => 'meta_value'),
-    	// ));
 
     	return redirect()->route('backend.case.index')->with('message', 'Your Case was created successfully!');
 
-
-        // request()->validate([
-        //     'title' => 'required',
-        //     'body' => 'required',
-        // ]);
-
-        // CaseIncedent::create($request->all());
-        // return redirect()->route('backend.case.index')
-        //                 ->with('status','Article created successfully');
     }
 
 
@@ -159,184 +125,132 @@ class CaseIncedentController extends BackendController
 
     	$data['case_title'] = $request->input('case_title');
     	$data['case_details'] = $request->input('case_details');
-    	//$data['name'] = $request->input('name');
-    	//$data['parents'] = $request->input('parents');
-    	//$data['location'] = $request->input('location');
-    	//$data['age'] = $request->input('age');
-    	//$data['gender'] = $request->input('gender');
     	$data['case_type'] = $request->input('case_type');
-
-    	$data['incident_date'] = date('Y-m-d H:i:s', strtotime($request->input('incident_date')));
-    	$data['action_taken'] = '['. join(',', $request->input('action_taken')) .']';
-
-        //$data = $request->all();
+		$data['incident_date'] = date('Y-m-d H:i:s', strtotime($request->input('incident_date')));
+		$data['action_taken'] = $request->input('action_taken');
 
         return $data;
     }
+// Save additional field to case meta 
+private function saveOtherField($request, $id){
 
+	$data_other_field = $request->input('casefieldextra');
 
-    // handle victim request
-    private function handleVictimRequest($request, $case_id){
+	
+	// For image file check
+	$new_image_array = array();
 
-    	$data_case_victim = array();
+	if ($request->hasFile('casefieldextra'))
+	{
 
-    	if(isset($case_id) && !empty($case_id)){
-    		$data_case_victim['case_id'] = $case_id;
-    		$data_case_victim['name'] = $request->input('name');
-    		$data_case_victim['parents'] = $request->input('parents');
-    		$data_case_victim['location'] = $request->input('location');
-    		$data_case_victim['age'] = $request->input('age');
-    		$data_case_victim['sex'] = $request->input('sex');
-    	}
-
-    	return $data_case_victim;
-
-    }
-
-
-    // Save additional field to case meta 
-    private function saveOtherField($request, $id){
-
-    	$data_other_field = $request->input('casefieldextra');
-
-    	
-    	// For image file check
-    	$new_image_array = array();
-
-    	if ($request->hasFile('casefieldextra'))
-    	{
-
-    		$all_image = $request->file('casefieldextra');
+		$all_image = $request->file('casefieldextra');
 
 
 
-    		$destination = $this->uploadPath;
+		$destination = $this->uploadPath;
 
-    		
+		
 
-    		foreach ($all_image as $key => $value) {
-
-
-    			$fileValidate = Validator::make($request->file(), 
-    				[
-			           //$key => 'mimes:jpg,jpeg,bmp,png|max:10240',
-			           $key => 'max:10240',
-			       	]
-    			);
-
-    			$file_valid_extensions = $this->checkFileMimeType($value);
+		foreach ($all_image as $key => $value) {
 
 
-    			if( !$fileValidate->fails() && $file_valid_extensions){
+			$fileValidate = Validator::make($request->file(), 
+				[
+				   //$key => 'mimes:jpg,jpeg,bmp,png|max:10240',
+				   $key => 'max:10240',
+				   ]
+			);
 
-    				$file = $value->getClientOriginalName();
-
-    				$extension = $value->getClientOriginalExtension();
-
-    				$file_name_modified = str_replace(' ', '-', strtolower($file));;
-
-    				$file_name_modified = preg_replace('/[^A-Za-z0-9\. -]/', '', $file_name_modified);
-
-    				$fileName = time().'_'.$file_name_modified;
-
-    				$file_path = "/" . date("Y") . '/' . date("m") . "/";
-
-    				
-    				$fileDatePath = $destination . $file_path;
+			$file_valid_extensions = $this->checkFileMimeType($value);
 
 
-    				if (! File::exists($fileDatePath)) {
-    				    File::makeDirectory($fileDatePath, 0777,true);
-    				}
+			if( !$fileValidate->fails() && $file_valid_extensions){
 
-    				$successUploaded = $value->move($fileDatePath, $fileName);
+				$file = $value->getClientOriginalName();
 
-    				if($successUploaded){
+				$extension = $value->getClientOriginalExtension();
 
-    					
+				$file_name_modified = str_replace(' ', '-', strtolower($file));;
 
-					    $width     = config('cms.image.thumbnail.width');
-					    $height    = config('cms.image.thumbnail.height');
-					    //$extension = $image->getClientOriginalExtension();
-					    $thumbnail = str_replace(".{$extension}", "_thumb.{$extension}", $fileName);
+				$file_name_modified = preg_replace('/[^A-Za-z0-9\. -]/', '', $file_name_modified);
 
-					    Image::make($fileDatePath . $fileName)
-					        ->resize($width, $height)
-					        ->save($fileDatePath . '/' . $thumbnail);
+				$fileName = time().'_'.$file_name_modified;
 
-					    //$new_image_array[$key] = $file_path . $fileName;
+				$file_path = "/" . date("Y") . '/' . date("m") . "/";
 
-					    $new_image_array_single['case_id'] = $id;
-					    $new_image_array_single['user_id'] = $request->user()->id;
-					    $new_image_array_single['meta_key'] = $key;
-					    $new_image_array_single['meta_value'] = ( !empty($file_path . $fileName) ? $file_path . $fileName : null );
-
-					    array_push($new_image_array, $new_image_array_single );
-
-    				}
-
-    			}
-
-    		} // foreach
+				
+				$fileDatePath = $destination . $file_path;
 
 
-    	}
+				if (! File::exists($fileDatePath)) {
+					File::makeDirectory($fileDatePath, 0777,true);
+				}
 
-    	
+				$successUploaded = $value->move($fileDatePath, $fileName);
+
+				if($successUploaded){
+
+					
+
+					$width     = config('cms.image.thumbnail.width');
+					$height    = config('cms.image.thumbnail.height');
+					//$extension = $image->getClientOriginalExtension();
+					$thumbnail = str_replace(".{$extension}", "_thumb.{$extension}", $fileName);
+
+					Image::make($fileDatePath . $fileName)
+						->resize($width, $height)
+						->save($fileDatePath . '/' . $thumbnail);
+
+					//$new_image_array[$key] = $file_path . $fileName;
+
+					$new_image_array_single['case_id'] = $id;
+					$new_image_array_single['user_id'] = $request->user()->id;
+					$new_image_array_single['meta_key'] = $key;
+					$new_image_array_single['meta_value'] = ( !empty($file_path . $fileName) ? $file_path . $fileName : null );
+
+					array_push($new_image_array, $new_image_array_single );
+
+				}
+
+			}
+
+		} // foreach
 
 
-    	if(!empty($id) && !empty($data_other_field) ){
+	}
 
-    		$new_other_filed2 = array();
-
-    		foreach ($data_other_field as $key => $value) {
-
-    			if(isset($key) && !empty($key)){
-    				$new_other_filed['case_id'] = $id;
-    				$new_other_filed['user_id'] = $request->user()->id;
-    				$new_other_filed['meta_key'] = $key;
-    				$new_other_filed['meta_value'] = ( !empty($value) ? $value : null );
-
-    				array_push($new_other_filed2, $new_other_filed );
-    			}
-
-    		}
-
-    		$last_new_other_fileds = array_merge($new_other_filed2, $new_image_array);
-
-    		//dd($last_new_other_fileds);
-
-    		return $last_new_other_fileds;
-    	}
-    	else{
-    		return false;
-    	}
-    	
-    }
+	
 
 
-    // Check File Mimie Type for validation
-    private function checkFileMimeType( $filename ){
+	if(!empty($id) && !empty($data_other_field) ){
 
-    	$check_valid_mime_type = false;
+		$new_other_filed2 = array();
 
-    	$all_valid_mime_type = [
-    		'image/png', 
-    		'image/jpeg', 
-    		'image/gif', 
-    		'image/bmp',
-    		'application/pdf',
-    		'application/msword',
-    		'application/vnd.ms-excel',
-    		'application/zip'
-    	];
+		foreach ($data_other_field as $key => $value) {
 
-    	$file_mime_type = $filename->getMimeType();
+			if(isset($key) && !empty($key)){
+				$new_other_filed['case_id'] = $id;
+				$new_other_filed['user_id'] = $request->user()->id;
+				$new_other_filed['meta_key'] = $key;
+				$new_other_filed['meta_value'] = ( !empty($value) ? $value : null );
 
-    	$check_valid_mime_type = in_array($file_mime_type,  $all_valid_mime_type);
+				array_push($new_other_filed2, $new_other_filed );
+			}
 
-    	return $check_valid_mime_type;
-    }
+		}
+
+		$last_new_other_fileds = array_merge($new_other_filed2, $new_image_array);
+
+		//dd($last_new_other_fileds);
+
+		return $last_new_other_fileds;
+	}
+	else{
+		return false;
+	}
+	
+}
+
 
 
     /**
@@ -347,184 +261,16 @@ class CaseIncedentController extends BackendController
      */
     public function show($id)
     {
-        $cases = CaseIncedent::with('user', 'casemeta', 'casevictim')->find($id);
+		$cases = CaseIncedent::with('user', 'casemeta', 'casevictim')->find($id);
+		
+		$users =  User::all();
 
-        //$cases_meta = CaseIncedent::with('casemeta')->find($id);
+		$assigned_engineer_id = $cases->assigned_engineer_id; 
+		$assigned_engineer = null; 
+		$assigned_engineer = User::find($assigned_engineer_id);
 
-        //dd($cases->casemeta);
 
-        $user_case_meta = CaseMeta::where('user_id', $cases->user->id)->where('case_id', $cases->id)->get();
-
-        //dd($user_case_meta);
-
-
-        //$new_array = array();
-        $cases_meta = array();
-        $cases_meta_inside = array();
-
-        $case_info_hd_first = array();
-
-        // meta id hd
-        $hd_meta_id = array();
-        $ff_meta_id = array();
-        $admin_meta_id = array();
-
-
-
-        if(isset($cases->casemeta) && !empty($cases->casemeta)){
-        	foreach ($cases->casemeta as $key => $value) {
-
-        		// Only multi image files fron mobile
-        		if( strpos($value['meta_key'], 'multi_files_images')  !== false ){
-        			$cases_meta['fa_multi_images'][$value['meta_key']] = $value['meta_value'];
-
-        		}
-        		// Only multi other files/pdf from mobile
-        		elseif( strpos($value['meta_key'], 'multi_files_other')  !== false ){
-        			$cases_meta['fa_multi_files'][$value['meta_key']] = $value['meta_value'];
-
-        		}
-        		// Only single image from mobile
-        		elseif( strpos($value['meta_key'], 'single_file_image')  !== false ){
-        			$cases_meta['fa_sing_image'][$value['meta_key']] = $value['meta_value'];
-
-        		}
-        		// Only single file/pdf from mobile
-        		elseif( strpos($value['meta_key'], 'single_file_other')  !== false ){
-        			$cases_meta['fa_sing_files'][$value['meta_key']] = $value['meta_value'];
-
-        		}
-        		// help desk team content
-        		elseif( strpos($value['meta_key'], 'case_info_hd')  !== false ){
-
-        			
-        			$get_the_id_array = explode('|', $value['meta_key']);
-
-        			$get_the_id_text = (int)str_replace('hd_content_text-', '', $get_the_id_array[1]);
-
-        			$get_the_id_files = (int)str_replace('hd_content_files-', '', $get_the_id_array[1]);
-
-        			$hd_meta_id[] = $get_the_id_text;
-
-        			$hd_meta_id[] = $get_the_id_files;
-
-        			$total_case_info_hd = max($hd_meta_id);
-        			
-
-        			$cases_meta['case_info_hd_count'] = ($total_case_info_hd + 1);
-
-
-        		}
-        		// Admin team case content
-        		elseif( strpos($value['meta_key'], 'case_info_admin')  !== false ){
-
-        			$get_the_id_array = explode('|', $value['meta_key']);
-
-        			$get_the_id_text = (int)str_replace('admin_content_text-', '', $get_the_id_array[1]);
-
-        			$get_the_id_files = (int)str_replace('admin_content_files-', '', $get_the_id_array[1]);
-
-        			$admin_meta_id[] = $get_the_id_text;
-
-        			$admin_meta_id[] = $get_the_id_files;
-
-        			$total_case_info_admin = max($admin_meta_id);
-
-
-        			$cases_meta['case_info_admin_count'] = ($total_case_info_admin + 1);
-        		}
-        		// FF team case content
-        		elseif( strpos($value['meta_key'], 'case_info_ff')  !== false ){
-
-        			$get_the_id_array = explode('|', $value['meta_key']);
-
-        			$get_the_id_text = (int)str_replace('ff_content_text-', '', $get_the_id_array[1]);
-
-        			$get_the_id_files = (int)str_replace('ff_content_files-', '', $get_the_id_array[1]);
-
-        			$ff_meta_id[] = $get_the_id_text;
-
-        			$ff_meta_id[] = $get_the_id_files;
-
-        			$total_case_info_ff = max($ff_meta_id);
-
-        			$cases_meta['case_info_ff_count'] = ($total_case_info_ff + 1);
-        		}
-        		else{
-        			$cases_meta['fa_field_normal'][$value['meta_key']] = $value['meta_value'];
-
-        		}
-        		
-        	}// end foreach
-
-        	
-
-        	$meta_info_hd = $this->hdMetaTeamMetaInfo($cases->casemeta, $hd_meta_id, $meta_name = 'case_info_hd');
-        	$meta_info_ff = $this->hdMetaTeamMetaInfo($cases->casemeta, $ff_meta_id, $meta_name = 'case_info_ff');
-        	$meta_info_admin = $this->hdMetaTeamMetaInfo($cases->casemeta, $admin_meta_id, $meta_name = 'case_info_admin');
-
-
-
-        	$cases_meta['case_info_hd'] = $meta_info_hd;
-        	$cases_meta['case_info_ff'] = $meta_info_ff;
-        	$cases_meta['case_info_admin'] = $meta_info_admin;
-
-
-
-        }
-
-
-
-       // all options
-        $all_actions = AsfOption::where('option_name', 'like', 'action_taken')->first(['option_value']);
-
-        $all_violence_type = AsfOption::where('option_name', 'like', 'violence_type')->first(['option_value']);
-
-        $all_actions = unserialize($all_actions['option_value']);
-
-        $all_violence_type = unserialize($all_violence_type['option_value']);
-
-        
-        // All comments from this case
-        $all_comments = CaseComment::where('case_id', $cases->id)->orderBy('id', 'DESC')->with('user')->oldest()->paginate(10);
-
-        
-        if( isset($all_comments) && !empty($all_comments) ){
-        	$all_comments_array = $all_comments->toArray();
-
-
-        	$all_users = array();
-
-        	foreach ($all_comments_array['data'] as $key => $value) {
-
-        		$user_profile = UserMeta::where('user_id', $value['user']['id'])->where('meta_key', 'like', 'profile_pic')->first(['meta_value']);
-
-
-        		if( !empty($user_profile) ){
-        			$profile_pic = unserialize($user_profile->meta_value);
-        		}
-        		else{
-        			$profile_pic = '';
-        		}
-
-        		
-        		$value['user']['profile_pic'] = !empty($profile_pic['url']) ? $this->uploadUrl . $profile_pic['url_thumb'] : null;
-
-        		$all_users[] = $value;
-        	}
-
-        	$reverse_array = array_reverse($all_users);
-
-
-        	$all_comments_array['data'] = $reverse_array;
-
-        	//$all_comments = array_merge($all_comments->data, $all_users);
-
-        }
-
-
-
-        return View::make('backend.case.show', ['cases' => $cases, 'cases_meta' => $cases_meta, 'action_taken' => $all_actions, 'violence_type' => $all_violence_type, 'case_comments' => $all_comments_array]);
+        return View::make('backend.case.show', ['assigned_engineer' => $assigned_engineer, 'users' => $users, 'cases' => $cases]);
         
     }
 
@@ -758,21 +504,7 @@ class CaseIncedentController extends BackendController
         			array('case_id' => $id, 'user_id' => $request->user()->id, 'meta_key' => $value['meta_key'], 'meta_value' => $value['meta_value'])
         		);
 
-
-        		// if(!$affectedRows){
-        		// 	$affectedRows = CaseMeta::where('case_id', '=', $id)->where('meta_key', 'like', $value['meta_key'])->update(array('meta_value' => $value['meta_value']));
-        		// }
-
-
-        		//dd($affectedRows);
         	}
-
-
-
-        	//$affectedRows = CaseMeta::where('case_id', '=', $id)->update($other_fields);
-
-        	//$affectedRows = User::where('votes', '>', 100)->update(array('status' => 2));
-
         }
 
 
@@ -926,25 +658,7 @@ class CaseIncedentController extends BackendController
 
 
     	$all_hd_case_info = array();
-    	
-
-    	foreach ($all_requent['case_info_admin'] as $key => $value) {
-
-
-    		foreach ($value as $key2 => $value2) {
-
-    			if( is_object($value2) ){
-    				$fianl_value2 = $this->uploadFile()->single_upload_file($value2);
-
-    				$all_hd_case_info['case_info_admin|'. $key .'|'. $key2 ] = $fianl_value2;
-    			}
-    			else{
-    				$all_hd_case_info['case_info_admin|'.$key .'|'. $key2 ] = filter_var($value2, FILTER_SANITIZE_STRING);
-    			}
-
-    		}
-
-    	}
+    	 
 
 
     	$all_hd_case_info_final = array();
@@ -1038,33 +752,73 @@ class CaseIncedentController extends BackendController
 
     	if ( empty($case_id) ) {
     		return;
-    	}
+		}
+		
+		
+	
 
     	$cases = CaseIncedent::findOrFail($case_id);
 
-    	$user_id = $cases->user_id;
+		$user_id = $cases->user_id;
+		
+		$user = Auth::guard('web')->user();
 
     	switch ( $request->input('case_status_action') ) {
-    		case 'archive':
+    		case 'failed':
 
-    			$cases->case_status = 'archive';
+				$engineer = User::find($cases->assigned_engineer_id);
 
-    			$cases->save();
-
-    			FcmNotificationsController::fcmSingleNotification($user_id, 'Case Archived', $cases->case_title);
-
-    			break;
-
-    		case 'open':
-
-    			$cases->case_status = 'open';
+				$engineer->free = 1;
+				
+				$engineer->save();
+				
+				$cases->case_status = 'failed';
 
     			$cases->save();
 
-    			FcmNotificationsController::fcmSingleNotification($user_id, 'Case Opened', $cases->case_title);
+    			FcmNotificationsController::fcmSingleNotification($user_id, 'Case Cancelled/Failed', $cases->case_title);
 
     			break;
-    		
+
+			case 'in-progress':
+
+				 
+				$eta = date('Y-m-d H:i:s', strtotime($request->input('eta')));
+				// $ert = $request->input('ert');
+				
+				$user->eta = $eta;
+				$user->ert = $request->input('ert');
+				$user->save();
+				
+
+    			$cases->case_status = 'in-progress';
+
+    			$cases->save();
+
+    			FcmNotificationsController::fcmSingleNotification($user_id, 'Case In-progress', $cases->case_title);
+
+				break;
+			
+			case 'completed':				
+
+				$engineer = User::find($cases->assigned_engineer_id);
+
+				$engineer->free = 1;
+				
+				$engineer->save();
+
+			    $user->eta = date('2000-01-01');
+				$user->ert = 0;
+				
+				$user->save();
+				
+			    $cases->case_status = 'completed';
+
+    			$cases->save();
+
+    			FcmNotificationsController::fcmSingleNotification($user_id, 'Case Completed', $cases->case_title);
+
+
     		default:
     			
     			break;
@@ -1075,63 +829,73 @@ class CaseIncedentController extends BackendController
     }
 
 
-    // Case incident change status by admin for approve
-    public function CaseChangeStatusAdmin(Request $request, $case_id){
+    // Case incident change status by manager 
+    public function CaseChangeStatusManager(Request $request, $case_id){
 
     	if ( empty($case_id) ) {
     		return;
     	}
 
-    	$cases = CaseIncedent::findOrFail($case_id);
-
+		$cases = CaseIncedent::findOrFail($case_id);
+		
     	$user_id = $cases->user_id;
 
-
     	switch ( $request->input('case_status_action') ) {
-    		case 'archive':
-    			
-    			//$cases = CaseIncedent::findOrFail($case_id);
+			case 'acknowledged':
 
-    			$cases->case_status = 'archive';
+    			$cases->case_status = 'acknowledged';
 
     			$cases->save();
 
-    			FcmNotificationsController::fcmSingleNotification($user_id, 'Case Archived', $cases->case_title);
+    			FcmNotificationsController::fcmSingleNotification($user_id, 'Case Acknowledged', $cases->case_title);
 
-    			break;
+				break;
+				
+			case 'assigned':
 
-    		case 'open':
+				$cases->assigned_engineer_id = $request->input('assigned_engineer');
 
-    			//$cases = CaseIncedent::findOrFail($case_id);
+				$user = User::find($cases->assigned_engineer_id);
 
-    			$cases->case_status = 'open';
+				$user->free = 0;
+				
+				$user->save();
 
-    			$cases->save();
-
-    			FcmNotificationsController::fcmSingleNotification($user_id, 'Case Opened', $cases->case_title);
-
-    			break;
-
-
-    		case 'approve':
-
-    			//$cases = CaseIncedent::findOrFail($case_id);
-
-    			$cases->case_status = 'approve';
+    			$cases->case_status = 'assigned';
 
     			$cases->save();
 
     			FcmNotificationsController::fcmSingleNotification($user_id, 'Case Approved', $cases->case_title);
 
-    			break;
-    		
+				break;
+
+			case 'archieved':
+
+    			$cases->case_status = 'archieved';
+
+    			$cases->save();
+
+    			FcmNotificationsController::fcmSingleNotification($user_id, 'Case Archieved', $cases->case_title);
+
+				break;
+
+			case 'unarchieved':
+
+    			$cases->case_status = 'new';
+
+    			$cases->save();
+
+    			FcmNotificationsController::fcmSingleNotification($user_id, 'Case Again Opened', $cases->case_title);
+
+				break;	
+
     		default:
     			
     			break;
     	}
 
 
-    	return redirect('backend/case/'.$case_id)->with('success-message', 'Case status has been updated');
+    	return redirect('backend/case/'.$case_id)->with('success-message', 'Ticket status has been updated');
     	
     }
 
