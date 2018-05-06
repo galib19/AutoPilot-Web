@@ -45,8 +45,10 @@
         </a>
         <ul class="treeview-menu">
           <li><a href="{{ route('backend.case.index') }}"><i class="fa fa-circle-o"></i> All Tickets</a></li>
-          @if( Auth::user()->roles[0]->name == ('client' || 'admin') )
+          @if( Auth::user()->roles[0]->name == ('client') )
               <li><a href="{{ route('backend.case.create') }}"><i class="fa fa-circle-o"></i> Add New</a></li>
+          @elseif( Auth::user()->roles[0]->name == ('admin') )
+          <li><a href="{{ route('backend.case.create') }}"><i class="fa fa-circle-o"></i> Add New</a></li>
           @endif
         </ul>
       </li>

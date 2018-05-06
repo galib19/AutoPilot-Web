@@ -32,7 +32,7 @@
                 <thead>
                     <tr>
                       <th style="width: 80px;">Ticket ID</th>
-                      <th>Tower Name/ID</th>
+                      <th>Tower Name/ID  - Problem</th>
                       <th style="width: 180px;">Created By</th>
                       <th style="width: 150px;">Ticket Status</th>
                       <th style="width: 180px;">Time</th>
@@ -53,7 +53,7 @@
 
                         <tr>
                         <td>{{ str_pad($case->id, 4, '0', STR_PAD_LEFT) }}</td>
-                        <td><a href="{{ route('backend.case.show', $case->id) }}">{{ $case->case_title }}</a></td>
+                        <td><a href="{{ route('backend.case.show', $case->id) }}">{{ $case->case_title }} - {{$case->case_type}}</a></td>
                         <td>
                             
                             @if($case->user)

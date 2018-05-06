@@ -145,77 +145,17 @@ class PassportController extends Controller
         
     }
 
-
-    public function userEdit(Request $request)
-    {
-        $user = Auth::user();
-
-        $validator = Validator::make($request->all(), [
-            'name' 			=> 'required|string',
-            'email' 		=> 'email',
-            'designation' 	=> 'string',
-            'profile_pic.0'  	=> 'mimes:jpg,jpeg,bmp,png|max:10240',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);            
-        }
-
-
-        $user_data = User::find($user->id);
-
-
-        $user_data->name = $request->name;
-        $user_data->email = $request->email;
-
-        $user_data->save();
-
-
-        $user_meta_data = array();
-
-        if( !empty($request->input('designation')) ){
-        	$user_meta_data['designation'] = $request->input('designation');
-        }
-
-
-        $profile_pic = $request->file('profile_pic');
-
-        if( !empty($profile_pic) ){
-
-	        $profile_pic = array_first($profile_pic);
-	        $fianl_profile_pic =  null;
-
-	        if( is_object($profile_pic) ){
-	        	$fianl_profile_pic = $this->uploadFile()->single_upload_file($profile_pic, true, 'profile_thumb');
-	        }
-
-	        $user_meta_data['profile_pic'] = $fianl_profile_pic;
-        }
-
-
-
-        if( isset($user_meta_data) && !empty($user_meta_data) ){
-
-        	foreach ($user_meta_data as $key => $value) {
-
-        		UserMeta::updateOrCreate(
-        			// Find match
-        			array('user_id' => $user->id, 'meta_key' => $key), 
-        			// Change value
-        			array('meta_value' => !empty($value) ? $value : null )
-        		);
-
-        	}
-
-        }
-
-        return response()->json(['success' => 'profile Update Successfully'], $this->successStatus);
-        
-	}
 	
 	public function caseUpdate(Request $request)
     {
-        $user = Auth::user();
+		$user = Auth::user();
+		
+		$case_id = $request->case_id;
+		
+		$case = CaseIncedent::where('id', $case_id)->first();
+
+		if($case->assigned_engineer_id != $user->id) 
+			return response()->json(['error'=>'Case is not assigned to you'], 404);
 
         $validator = Validator::make($request->all(), [
             'eta' 			=> 'required',
@@ -227,10 +167,7 @@ class PassportController extends Controller
             return response()->json(['error'=>$validator->errors()], 401);            
         }
 
-		$case_id = $request->case_id;
 		
-		$case = CaseIncedent::where('id', $case_id)->first();
-
 		$case->case_status = "in-progress" ;
 
 		$case->save();
@@ -243,104 +180,6 @@ class PassportController extends Controller
         return response()->json(['success' => 'Case Update Successfully'], $this->successStatus);
         
     }
-
-    public function mostRecent()
-    {
-        $user = Auth::user();
-
-        $cases = CaseIncedent::where('user_id', $user->id)->latest()->first();
-
-
-        if( empty($cases) && $cases == null ) {
-
-        	$no_case_array = array();
-
-        	$no_case_array['data'] = [];
-            //return response()->json(['success'=> 'No Case Available'], $this->successStatus);
-            return response()->json(['success' => $no_case_array], $this->successStatus);        
-        }
-
-
-        $cases = $cases->toArray();
-
-        // cases action taken
-        $all_action_taken = $this->cases_action_taken($cases);
-
-        if( !empty($all_action_taken) ){
-
-        	$cases['action_taken'] = $all_action_taken;
-
-        }
-
-
-        $cases_with_victim = $this->caseDetailsWithVictim($cases);
-
-        $final_cases_last = $this->caseDetailsWithMeta( $cases_with_victim );
-
-        $total_comments = $this->totalCommentsByCaseId($final_cases_last['id']);
-
-        $final_cases_last['total_comments'] = $total_comments;
-
-        $final_new_array_data['data'][] = $final_cases_last;
-        
-
-        if( !empty($cases) && $cases != null ){
-        	return response()->json(['success' => $final_new_array_data], $this->successStatus);
-        }
-        else{
-        	return response()->json(['error'=>'Not Found'], 404);
-        }
-
-
-        
-    }
-
-
-    public function totalCases()
-    {
-        $user = Auth::user();
-
-        $cases = CaseIncedent::where('user_id', $user->id)->latest()->paginate(10)->toArray();
-
-        
-        $final_cases = array();
-        $final_cases_two = array();
-        $final_cases_three = array();
-
-        foreach ($cases['data'] as $key => $value) {
-
-        	// Cases action
-        	$all_action_taken = $this->cases_action_taken($value);
-
-        	if( !empty($all_action_taken) ){
-
-        		$value['action_taken'] = $all_action_taken;
-
-        	}
-
-        	
-        	$final_cases = $this->caseDetailsWithVictim($value);
-
-        	// Add Total comments
-        	$total_comments = $this->totalCommentsByCaseId($value['id']);
-        	$final_cases['total_comments'] = $total_comments;
-
-        	$final_cases_two[] = $this->caseDetailsWithMeta( $final_cases );
-
-        }
-
-        $final_cases_last = array_merge( $cases, array('data' => $final_cases_two ));
-        
-
-        
-        if( !empty($cases) && $cases != null ){
-        	return response()->json(['success' => $final_cases_last], $this->successStatus);
-        }
-        else{
-        	return response()->json(['error'=>'Not Found'], 404);
-        }
-
-	}
 	
 	public function allUsers()
     {
@@ -371,47 +210,6 @@ class PassportController extends Controller
         }
 
     }
-
-    // Cases action taken 
-    private function cases_action_taken($cases){
-
-    	if( empty($cases) ){
-    		return;
-    	}
-
-    	$cases_all_action_taken = $cases['action_taken'];
-
-        if( !empty($cases_all_action_taken) ){
-
-        	$cases_all_action_taken = str_replace(array('[', ']'), '', $cases_all_action_taken);
-
-        	$cases_all_action_taken = explode(',', $cases_all_action_taken);
-
-        	$all_asf_action_taken = AsfOption::where('option_name', 'like', 'action_taken')->first(['option_value']);
-
-        	$all_asf_action_taken_2 = unserialize($all_asf_action_taken->option_value);
-
-        	$new_action_taken_array = array();
-        	$new_action_taken_array_last = array();
-
-        	foreach ($cases_all_action_taken as $key => $value) {
-        		
-        		$new_action_taken_array['id'] = $value;
-        		$new_action_taken_array['name'] = isset($all_asf_action_taken_2[$value]) ? $all_asf_action_taken_2[$value] : null;
-
-        		$new_action_taken_array_last[] = $new_action_taken_array;
-
-        	}
-
-        	return $new_action_taken_array_last;
-
-        }
-        else{
-        	return;
-        }
-
-    }
-
 
     public function createCase(Request $request)
     {
@@ -806,12 +604,14 @@ class PassportController extends Controller
     	return $check_valid_mime_type;
 	}
 	
-	public function caseDetails($id){
+	public function caseDetails(Request $request){
 
     	
-    	$user = Auth::user();
+		$user = Auth::user();
+		
+		$case_id = $request->case_id;
 
-    	$cases = CaseIncedent::where('assigned_engineer_id', $user->id)->find($id);
+    	$cases = CaseIncedent::where('assigned_engineer_id', $user->id)->find($case_id);
 
     	//$cases_meta = CaseIncedent::with('casemeta')->find($id);
 

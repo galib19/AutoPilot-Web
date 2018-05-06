@@ -238,8 +238,8 @@
 																				</td>
 																				<td>
 																					@if($user->free==0)
-																						<span class="label label-info">ASSIGNED</span>
-																					@else <span class="label label-default">NOT ASSIGNED</span>
+																						<span class="label label-warning">WORKING</span>
+																					@else <span class="label label-success">AVAILABLE</span>
 																					@endif
 																				</td>
 																				<td>

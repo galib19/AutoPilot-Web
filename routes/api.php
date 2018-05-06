@@ -33,8 +33,8 @@ Route::group(['middleware' => 'auth:api'], function(){
 	Route::post('allcases', 'API\PassportController@allCases');
 	Route::post('totalcases', 'API\PassportController@totalCases');
 	Route::post('clientCaseDetails/{id}', 'API\PassportController@clientCaseDetails');
-	Route::post('caseDetails/{id}', 'API\PassportController@caseDetails');
-	Route::post('caseDetails/{id}/update', 'API\PassportController@caseUpdate');
+	Route::post('caseDetails', 'API\PassportController@caseDetails');
+	Route::post('caseDetails/update', 'API\PassportController@caseUpdate');
 	Route::post('password/change', 'API\PassportController@changePassword');
 	Route::post('settings', 'API\PassportController@asfSettings');
 	Route::post('create', 'API\PassportController@createCase');

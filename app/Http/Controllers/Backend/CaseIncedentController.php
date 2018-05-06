@@ -766,11 +766,11 @@ private function saveOtherField($request, $id){
     	switch ( $request->input('case_status_action') ) {
     		case 'failed':
 
-				$engineer = User::find($cases->assigned_engineer_id);
-
-				$engineer->free = 1;
+				$user->free = 1;
+			    $user->eta = date('2000-01-01');
+				$user->ert = 0;
 				
-				$engineer->save();
+				$user->save();
 				
 				$cases->case_status = 'failed';
 
@@ -788,9 +788,10 @@ private function saveOtherField($request, $id){
 				
 				$user->eta = $eta;
 				$user->ert = $request->input('ert');
+				$user->free = 0; 
+
 				$user->save();
 				
-
     			$cases->case_status = 'in-progress';
 
     			$cases->save();
@@ -799,14 +800,9 @@ private function saveOtherField($request, $id){
 
 				break;
 			
-			case 'completed':				
+			case 'completed':		
 
-				$engineer = User::find($cases->assigned_engineer_id);
-
-				$engineer->free = 1;
-				
-				$engineer->save();
-
+				$user->free = 1;
 			    $user->eta = date('2000-01-01');
 				$user->ert = 0;
 				
@@ -855,11 +851,11 @@ private function saveOtherField($request, $id){
 
 				$cases->assigned_engineer_id = $request->input('assigned_engineer');
 
-				$user = User::find($cases->assigned_engineer_id);
+				// $user = User::find($cases->assigned_engineer_id);
 
-				$user->free = 0;
+				// $user->free = 0;
 				
-				$user->save();
+				// $user->save();
 
     			$cases->case_status = 'assigned';
 
@@ -873,7 +869,15 @@ private function saveOtherField($request, $id){
 
     			$cases->case_status = 'archieved';
 
-    			$cases->save();
+				$cases->save();
+				
+				$engineer = User::find($cases->assigned_engineer_id);
+
+				$engineer->free = 1;
+				$engineer->eta = date('2000-01-01');
+				$engineer->ert = 0;
+				
+				$engineer->save();
 
     			FcmNotificationsController::fcmSingleNotification($user_id, 'Case Archieved', $cases->case_title);
 
