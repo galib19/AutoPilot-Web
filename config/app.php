@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => 'Acid Survivors Foundation',
+    'name' => 'Quick Force',
     // 'name' => env('APP_NAME', 'Laravel'),
 
     /*

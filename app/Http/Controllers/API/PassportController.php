@@ -150,12 +150,6 @@ class PassportController extends Controller
     {
         $user = Auth::user();
 
-        //dd($request->all());
-
-        //$user_meta = User::with('usermeta')->find($user->id);
-
-        //CaseMeta::where('case_id', '=', $id)->where('meta_key', 'like', $value['meta_key'])
-
         $validator = Validator::make($request->all(), [
             'name' 			=> 'required|string',
             'email' 		=> 'email',
@@ -217,8 +211,38 @@ class PassportController extends Controller
 
         return response()->json(['success' => 'profile Update Successfully'], $this->successStatus);
         
-    }
+	}
+	
+	public function caseUpdate(Request $request)
+    {
+        $user = Auth::user();
 
+        $validator = Validator::make($request->all(), [
+            'eta' 			=> 'required',
+			'ert' 		=> 'required|integer',
+			'case_id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);            
+        }
+
+		$case_id = $request->case_id;
+		
+		$case = CaseIncedent::where('id', $case_id)->first();
+
+		$case->case_status = "in-progress" ;
+
+		$case->save();
+
+        $user->ert = $request->eta;
+        $user->ert = $request->ert;
+
+        $user->save();
+
+        return response()->json(['success' => 'Case Update Successfully'], $this->successStatus);
+        
+    }
 
     public function mostRecent()
     {
@@ -316,8 +340,37 @@ class PassportController extends Controller
         	return response()->json(['error'=>'Not Found'], 404);
         }
 
+	}
+	
+	public function allUsers()
+    {
+        $user = Auth::user();
+
+        $users = User::orderBy('id', 'DESC')->latest()->paginate(10)->toArray();
+
+        if( !empty($users) && $users != null ){
+        	return response()->json(['success' => $users], $this->successStatus);
+        }
+        else{
+        	return response()->json(['error'=>'Not Found'], 404);
+        }
+
     }
 
+	public function allCases()
+    {
+        $user = Auth::user();
+
+        $cases = CaseIncedent::where('assigned_engineer_id', $user->id)->latest()->paginate(10)->toArray();
+
+        if( !empty($cases) && $cases != null ){
+        	return response()->json(['success' => $cases], $this->successStatus);
+        }
+        else{
+        	return response()->json(['error'=>'Not Found'], 404);
+        }
+
+    }
 
     // Cases action taken 
     private function cases_action_taken($cases){
@@ -751,57 +804,39 @@ class PassportController extends Controller
     	$check_valid_mime_type = in_array($file_mime_type,  $all_valid_mime_type);
 
     	return $check_valid_mime_type;
-    }
-
-
-    // Check Request value array or object for files
-    // private function checkRequestValue($value){
-
-    // 	if( is_object($value) ){
-
-    // 		return true;
-    // 	}
-    // 	else{
-    // 		return false;
-    // 	}
+	}
+	
+	public function caseDetails($id){
 
     	
+    	$user = Auth::user();
 
-    // }
+    	$cases = CaseIncedent::where('assigned_engineer_id', $user->id)->find($id);
 
+    	//$cases_meta = CaseIncedent::with('casemeta')->find($id);
 
-    // private function checkRequestFileType($file){
+    	//dd($cases);
+    	
 
-    // 	if( !empty($file) && $file != null && is_object($file) ){
+    	if( !empty($cases) && $cases != null ){
 
-    // 		$all_valid_mime_type = [
-    // 			'image/png', 
-    // 			'image/jpeg', 
-    // 			'image/gif', 
-    // 			'image/bmp',
-    // 			'application/pdf',
-    // 			'application/msword',
-    // 			'application/vnd.ms-excel',
-    // 			'application/zip'
-    // 		];
+    		$cases = $cases->toArray();
 
-    // 		$fileMimeType = $file->getMimeType();
+    		$final_cases = $this->caseDetailsWithVictim($cases);
+    		$final_cases_last = $this->caseDetailsWithMeta($final_cases);
 
-    // 		$check_valid_mime_type = in_array($fileMimeType,  $all_valid_mime_type);
+    		return response()->json(['success' => $final_cases_last], $this->successStatus);
+    	}
+    	else{
+    		return response()->json(['error'=>'Not Found'], 404);
+    	}
 
-    // 		return $check_valid_mime_type;
+    	//return View::make('backend.case.show', ['cases' => $cases, 'cases_meta' => $cases_meta]);
 
-    // 	}
-    // 	else{
-    // 		return;
-    // 	}
-
-    // }
-
-
+    }
 
     //Case details show
-    public function caseDetails($id){
+    public function clientCaseDetails($id){
 
     	$user = Auth::user();
 

@@ -109,14 +109,14 @@
             <div class="pull-right hidden-xs">
                 Developed by Brainstation-23.com
             </div>
-            Copyright &copy; {{ date('Y') }} <strong>Acid Survivors Foundation</strong> All rights reserved.
+            Copyright &copy; {{ date('Y') }} <strong>Brain Station 23</strong> All rights reserved.
         </footer>
 
         
     </div> <!-- #app -->
 
 
-
+    @yield('script')
     <!-- Scripts -->
     <!-- jQuery 2.2.3 -->
     <script src="/backend/js/jquery-2.2.3.min.js"></script>
@@ -133,6 +133,6 @@
     <script src="/backend/js/app.min.js"></script>
     <script src="/backend/js/custom.js"></script>
 
-    @yield('script')
+    
 </body>
 </html>

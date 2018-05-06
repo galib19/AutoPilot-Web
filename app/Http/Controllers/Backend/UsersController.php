@@ -95,14 +95,14 @@ class UsersController extends BackendController
     	$validator = Validator::make($request->all(), [
     	    'name'        			=> 'required|string',
     	    'designation'        	=> 'string',
-    	    'user_location'        	=> 'string',
+    	    //'user_location'        	=> 'string',
     	    'phone'         		=> 'required|unique:users|regex:/(01)[0-9]{9}/|size:11',
     	    'password'         		=> 'required',
     	    'confirm_password'      => 'required|same:password',
     	    'email'  				=> 'email',
     	    'active'  				=> ['required', Rule::in(['1', '0'])],
-    	    'role'        			=> ['required', Rule::in(['admin', 'fact_finding', 'help_desk', 'field_agent'])],
-    	    'profile_pic'  			=> 'mimes:jpg,jpeg,bmp,png|max:10240',
+    	    'role'        			=> ['required', Rule::in(['manager', 'engineer', 'client'])],
+    	    //'profile_pic'  			=> 'mimes:jpg,jpeg,bmp,png|max:10240',
     	]);
 
 
@@ -117,7 +117,7 @@ class UsersController extends BackendController
     	$data->remember_token = str_random(60);
     	$data->save();
 
-    	$data->detachRoles(['super_admin', 'admin', 'fact_finding', 'help_desk', 'field_agent']);
+    	$data->detachRoles(['manager', 'engineer', 'client']);
         $data->attachRole($request->input('role'));
 
     	$data_user_meta = $this->handleUserMetaRequest($request, $data->id);
@@ -274,7 +274,7 @@ class UsersController extends BackendController
             'name'        			=> 'required|string',
             'designation'        	=> 'string',
             'user_location'        	=> 'string',
-            'role'        			=> ['string', Rule::in(['admin', 'fact_finding', 'help_desk', 'field_agent'])],
+            'role'        			=> ['string', Rule::in(['manager', 'engineer', 'client'])],
             // 'phone'         		=> 'required|unique:users|regex:/(01)[0-9]{9}/|size:11',
             //'password'         		=> 'required',
             //'confirm_password'      => 'same:password',
@@ -297,7 +297,7 @@ class UsersController extends BackendController
         $user_info->save(); // To Bypass fillable
 
 
-        $user_info->detachRoles(['super_admin', 'admin', 'fact_finding', 'help_desk', 'field_agent']);
+        $user_info->detachRoles(['manager', 'engineer', 'client']);
         $user_info->attachRole($request->input('role'));
 
 

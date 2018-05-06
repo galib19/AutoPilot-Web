@@ -38,14 +38,16 @@
       <li class="treeview">
         <a href="#">
           <i class="fa fa-pencil"></i>
-          <span>Cases</span>
+          <span>Tickets</span>
           <span class="pull-right-container">
             <i class="fa fa-angle-left pull-right"></i>
           </span>
         </a>
         <ul class="treeview-menu">
-          <li><a href="{{ route('backend.case.index') }}"><i class="fa fa-circle-o"></i> All Cases</a></li>
-          <li><a href="{{ route('backend.case.create') }}"><i class="fa fa-circle-o"></i> Add New</a></li>
+          <li><a href="{{ route('backend.case.index') }}"><i class="fa fa-circle-o"></i> All Tickets</a></li>
+          @if( Auth::user()->roles[0]->name == ('client' || 'admin') )
+              <li><a href="{{ route('backend.case.create') }}"><i class="fa fa-circle-o"></i> Add New</a></li>
+          @endif
         </ul>
       </li>
       
@@ -60,7 +62,9 @@
         </a>
         <ul class="treeview-menu">
           <li><a href="{{ route('backend.user.index') }}"><i class="fa fa-circle-o"></i> All Users</a></li>
+          @if( check_user_permissions(request(), 'Users@create') )
           <li><a href="{{ route('backend.user.create') }}"><i class="fa fa-circle-o"></i> Add New</a></li>
+          @endif 
         </ul>
       </li>
       @endif

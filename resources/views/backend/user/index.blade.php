@@ -73,15 +73,13 @@
                       <td><a href="{{ route('backend.user.show', $user->id) }}">{{ $user->name }}</a></td>
                       <td width="200">
 						
-						@if( isset($user->roles[0]->name) && $user->roles[0]->name == 'super_admin' )
+						@if( isset($user->roles[0]->name) && $user->roles[0]->name == 'admin' )
 							<span class="label label-danger">{{ $user->roles[0]->display_name or '' }}</span>
-						@elseif( isset($user->roles[0]->name) && $user->roles[0]->name == 'admin' )
+						@elseif( isset($user->roles[0]->name) && $user->roles[0]->name == 'manager' )
 							<span class="label label-success">{{ $user->roles[0]->display_name or '' }}</span>
-						@elseif( isset($user->roles[0]->name) && $user->roles[0]->name == 'fact_finding' )
+						@elseif( isset($user->roles[0]->name) && $user->roles[0]->name == 'engineer' )
 							<span class="label label-primary">{{ $user->roles[0]->display_name or '' }}</span>
-						@elseif( isset($user->roles[0]->name) && $user->roles[0]->name == 'help_desk' )
-							<span class="label label-warning">{{ $user->roles[0]->display_name or '' }}</span>
-						@elseif( isset($user->roles[0]->name) && $user->roles[0]->name == 'field_agent' )
+						@elseif( isset($user->roles[0]->name) && $user->roles[0]->name == 'client' )
 							<span class="label label-info">{{ $user->roles[0]->display_name or '' }}</span>
 						@else
 							<span class="label label-info">{{ $user->roles[0]->display_name or '' }}</span>
