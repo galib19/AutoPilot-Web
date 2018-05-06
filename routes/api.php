@@ -27,10 +27,14 @@ Route::post('password/regenerate', 'API\PassportController@resetPasswordPhone');
 
 Route::group(['middleware' => 'auth:api'], function(){
 	Route::post('userme', 'API\PassportController@userMe');
+	Route::post('allusers', 'API\PassportController@allUsers');
 	Route::post('userme/edit', 'API\PassportController@userEdit');
 	Route::post('mostrecent', 'API\PassportController@mostRecent');
+	Route::post('allcases', 'API\PassportController@allCases');
 	Route::post('totalcases', 'API\PassportController@totalCases');
-	Route::post('details/{id}', 'API\PassportController@caseDetails');
+	Route::post('clientCaseDetails/{id}', 'API\PassportController@clientCaseDetails');
+	Route::post('caseDetails/{id}', 'API\PassportController@caseDetails');
+	Route::post('caseDetails/{id}/update', 'API\PassportController@caseUpdate');
 	Route::post('password/change', 'API\PassportController@changePassword');
 	Route::post('settings', 'API\PassportController@asfSettings');
 	Route::post('create', 'API\PassportController@createCase');

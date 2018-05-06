@@ -42,59 +42,62 @@
                 <tbody>
                     
                     @foreach($cases as $case)
-                    @if($user->roles[0]->name != 'admin' &&  $case->case_status == 'archieved' )
-                        @continue
-                    @elseif($user->roles[0]->name == 'client' && $case->user->id != $user->id)
-                        @continue
-                    @elseif($user->roles[0]->name == 'engineer' && $case->assigned_engineer_id != $user->id)
-                        @continue
-                    @endif
 
-                    <tr>
-                      <td>{{ str_pad($case->id, 4, '0', STR_PAD_LEFT) }}</td>
-                      <td><a href="{{ route('backend.case.show', $case->id) }}">{{ $case->case_title }}</a></td>
-                      <td>
-						
-						@if($case->user)
-                      	{{ $case->user->name }}
-						@endif
-                      </td>
-						
-                        @if( $case->case_status == 'new' )
-                            <td><span class="label label-default">{{ $case->case_status }}</span></td>
-                        @elseif( $case->case_status == 'acknowledged' )
-                            <td><span class="label label-info">{{ $case->case_status }}</span></td>
-                        @elseif( $case->case_status == 'assigned' )
-                            <td><span class="label label-primary">{{ $case->case_status }}</span></td>
-                        @elseif( $case->case_status == 'in-progress' )
-                            <td><span class="label label-warning">{{ $case->case_status }}</span></td>
-                        @elseif( $case->case_status == 'completed' )
-                            <td><span class="label label-success">{{ $case->case_status }}</span></td>
-                        @elseif( $case->case_status == 'failed' )
-                            <td><span class="label label-danger">{{ $case->case_status }}</span></td>
+                        @if($user->roles[0]->name != 'admin' &&  $case->case_status == 'archieved' )
+                            @continue
+                        @elseif($user->roles[0]->name == 'client' && $case->user->id != $user->id)
+                            @continue
+                        @elseif($user->roles[0]->name == 'engineer' && $case->assigned_engineer_id != $user->id)
+                            @continue
                         @endif
 
-                      
-                      	<td><abbr title="2016/12/04 6:32:00 PM">{{ date('d-m-Y h:i A', strtotime($case->created_at)) }}</abbr></td>
-                      	<td width="100">
-                        	<a title="View" class="btn btn-xs btn-default edit-row" href="{{ route('backend.case.show', $case->id) }}">
-                            <i class="fa fa-eye"></i>
-                        	</a>
-                        	@if( check_user_permissions(request(), 'CaseIncedent@edit') )
-                          	<a title="Edit" class="btn btn-xs btn-default edit-row" href="{{ route('backend.case.edit', $case->id) }}">
-                              <i class="fa fa-edit"></i>
-                          	</a>
-                          	@endif
-                          	@if( check_user_permissions(request(), 'CaseIncedent@destroy') )
-                          	{!! Form::open(['method' => 'DELETE', 'route' => ['backend.case.destroy', $case->id], 'class' => 'd_inline_b']) !!}
-                              
-                                <button type="submit" class="btn btn-xs btn-danger" onClick="return confirm('Are you sure you want to delete?')">
-                                    <i class="fa fa-times"></i>
-                                </button>
-                          	{!! Form::close() !!}
-                          	@endif
-                      </td>
-                    </tr>
+                        <tr>
+                        <td>{{ str_pad($case->id, 4, '0', STR_PAD_LEFT) }}</td>
+                        <td><a href="{{ route('backend.case.show', $case->id) }}">{{ $case->case_title }}</a></td>
+                        <td>
+                            
+                            @if($case->user)
+                            {{ $case->user->name }}
+                            @endif
+                        </td>
+                            
+                            @if( $case->case_status == 'new' )
+                                <td><span class="label label-default">{{ $case->case_status }}</span></td>
+                            @elseif( $case->case_status == 'acknowledged' )
+                                <td><span class="label label-info">{{ $case->case_status }}</span></td>
+                            @elseif( $case->case_status == 'assigned' )
+                                <td><span class="label label-primary">{{ $case->case_status }}</span></td>
+                            @elseif( $case->case_status == 'in-progress' )
+                                <td><span class="label label-warning">{{ $case->case_status }}</span></td>
+                            @elseif( $case->case_status == 'completed' )
+                                <td><span class="label label-success">{{ $case->case_status }}</span></td>
+                            @elseif( $case->case_status == 'failed' )
+                                <td><span class="label label-danger">{{ $case->case_status }}</span></td>
+                            @elseif( $case->case_status == 'archieved' )
+                                <td><span class="label label-danger">{{ $case->case_status }}</span></td>
+                            @endif
+
+                        
+                            <td><abbr title="2016/12/04 6:32:00 PM">{{ date('d-m-Y h:i A', strtotime($case->created_at)) }}</abbr></td>
+                            <td width="100">
+                                <a title="View" class="btn btn-xs btn-default edit-row" href="{{ route('backend.case.show', $case->id) }}">
+                                <i class="fa fa-eye"></i>
+                                </a>
+                                @if( check_user_permissions(request(), 'CaseIncedent@edit') )
+                                <a title="Edit" class="btn btn-xs btn-default edit-row" href="{{ route('backend.case.edit', $case->id) }}">
+                                <i class="fa fa-edit"></i>
+                                </a>
+                                @endif
+                                @if( check_user_permissions(request(), 'CaseIncedent@destroy') )
+                                {!! Form::open(['method' => 'DELETE', 'route' => ['backend.case.destroy', $case->id], 'class' => 'd_inline_b']) !!}
+                                
+                                    <button type="submit" class="btn btn-xs btn-danger" onClick="return confirm('Are you sure you want to delete?')">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                {!! Form::close() !!}
+                                @endif
+                        </td>
+                        </tr>
 
                     @endforeach
 
