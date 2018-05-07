@@ -866,19 +866,23 @@ private function saveOtherField($request, $id){
 				break;
 
 			case 'archieved':
+				
+				
+				if($cases->case_status == "in-progress") 
+				{
+					$engineer = User::find($cases->assigned_engineer_id);
 
-    			$cases->case_status = 'archieved';
+					$engineer->free = 1;
+					$engineer->eta = date('2000-01-01');
+					$engineer->ert = 0;
+					
+					$engineer->save();		
+				}
+				
+				
+				$cases->case_status = 'archieved';
 
 				$cases->save();
-				
-				$engineer = User::find($cases->assigned_engineer_id);
-
-				$engineer->free = 1;
-				$engineer->eta = date('2000-01-01');
-				$engineer->ert = 0;
-				
-				$engineer->save();
-
     			FcmNotificationsController::fcmSingleNotification($user_id, 'Case Archieved', $cases->case_title);
 
 				break;

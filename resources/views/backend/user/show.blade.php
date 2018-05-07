@@ -59,7 +59,7 @@
 					<strong> Designation</strong>
 
 					<p class="text-muted">
-						{{ $usermeta['designation'] or '' }}
+						{{ $user->roles[0]->display_name }}
 					</p>
 
 					<hr>
@@ -82,14 +82,7 @@
 
 					<hr>
 					
-					<strong>Field Agent Location</strong>
-					<p class="text-muted">
-						
-						@if( isset($usermeta['user_location']) )
-							{{ $all_location[$usermeta['user_location']] }}
-						@endif
-						
-					</p>
+					
 				</div>
 				<!-- /.box-body -->
 			</div>

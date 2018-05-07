@@ -111,9 +111,10 @@ class UsersController extends BackendController
     	}
 
     	$data = $this->handleRequest($request);
-
+        $data['eta'] = date('2000-01-01');
+        $data['ert'] = 0;
     	$data = User::create($data);
-
+        
     	$data->remember_token = str_random(60);
     	$data->save();
 
@@ -139,7 +140,9 @@ class UsersController extends BackendController
     	$data['phone'] = $request->input('phone');
     	$data['email'] = $request->input('email');
     	$data['password'] = Hash::make($request->input('password'));
-    	$data['active'] = $request->input('active');
+        $data['active'] = $request->input('active');
+        
+					
     	//$data['remember_token'] = str_random(60);
 
         return $data;

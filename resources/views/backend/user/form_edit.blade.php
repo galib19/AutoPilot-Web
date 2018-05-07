@@ -31,15 +31,6 @@
 				@endif
 			</div>
 
-			<div class="box_body_section form-group {{ $errors->has('designation') ? 'has-error' : '' }}">
-				{!! Form::label('Enter Designation') !!}
-				{!! Form::text('designation', null, ['class' => 'form-control']) !!}
-
-				@if($errors->has('designation'))
-				    <span class="help-block">{{ $errors->first('designation') }}</span>
-				@endif
-			</div>
-
 			<div class="box_body_section form-group {{ $errors->has('phone') ? 'has-error' : '' }}">
 			
 				<label>Phone Number</label>
@@ -63,9 +54,9 @@
 				
 				@if( isset($user->roles[0]['name']) && !empty($user->roles[0]['name']) )
 					
-					{!! Form::select('role', ['field_agent' => 'Field Agent/Volunteer', 'help_desk' => 'Help Desk Member', 'fact_finding' => 'Fact Finding Member', 'admin' => 'Admin'], $user->roles[0]['name'], ['class' => 'form-control']) !!}
+					{!! Form::select('role', ['client' => 'Client', 'engineer' => 'Engineer', 'manager' => 'Manager'], $user->roles[0]['name'], ['class' => 'form-control']) !!}
 				@else
-					{!! Form::select('role', ['field_agent' => 'Field Agent/Volunteer', 'help_desk' => 'Help Desk Member', 'fact_finding' => 'Fact Finding Member', 'admin' => 'Admin'], null, ['class' => 'form-control']) !!}
+					{!! Form::select('role', ['client' => 'Client', 'engineer' => 'Engineer', 'manager' => 'Manager'], null, ['class' => 'form-control']) !!}
 				@endif
 
 				@if($errors->has('role'))
@@ -74,7 +65,7 @@
 			</div>
 
 
-			<div class="box_body_section form-group {{ $errors->has('name') ? 'has-error' : '' }}">
+			{{-- <div class="box_body_section form-group {{ $errors->has('name') ? 'has-error' : '' }}">
 				@if( isset($user_meta["profile_pic"]) )
 					<p><img class="img-responsive" src="{{ asset('uploads') }}{{ $user_meta["profile_pic"] }}" alt=""></p>
 				@endif
@@ -84,7 +75,7 @@
 				@if($errors->has('profile_pic'))
 				    <span class="help-block">{{ $errors->first('profile_pic') }}</span>
 				@endif
-			</div>
+			</div> --}}
 
 
 			<div class="box_body_section form-group {{ $errors->has('active') ? 'has-error' : '' }}">
@@ -100,14 +91,14 @@
 			</div>
 
 
-			<div class="box_body_section form-group {{ $errors->has('user_location') ? 'has-error' : '' }}">
+			{{-- <div class="box_body_section form-group {{ $errors->has('user_location') ? 'has-error' : '' }}">
 				{!! Form::label('Field Agent location') !!}
 				{!! Form::select('user_location', $user_location, null, ['class' => 'form-control']) !!}
 
 				@if($errors->has('user_location'))
 				    <span class="help-block">{{ $errors->first('user_location') }}</span>
 				@endif
-			</div>
+			</div> --}}
 
 
 

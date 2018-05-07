@@ -83,7 +83,7 @@
                                 <a title="View" class="btn btn-xs btn-default edit-row" href="{{ route('backend.case.show', $case->id) }}">
                                 <i class="fa fa-eye"></i>
                                 </a>
-                                @if( check_user_permissions(request(), 'CaseIncedent@edit') )
+                                @if( (check_user_permissions(request(), 'CaseIncedent@edit')) && ($case->case_status == "new"))
                                 <a title="Edit" class="btn btn-xs btn-default edit-row" href="{{ route('backend.case.edit', $case->id) }}">
                                 <i class="fa fa-edit"></i>
                                 </a>

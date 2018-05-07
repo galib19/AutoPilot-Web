@@ -29,9 +29,7 @@
         <div class="col-xs-12">
           <div class="box">
               <div class="box-header">
-                  <div class="pull-left">
-                      <a id="add-button" title="Add New" class="btn btn-success" href="{{ route('backend.user.create') }}"><i class="fa fa-plus-circle"></i> Add New</a>
-                  </div>
+                  
                   <div class="pull-right">
                       <!-- <form accept-charset="utf-8" method="post" class="form-inline" id="form-filter" action="#">
                           <div class="input-group">
@@ -93,9 +91,11 @@
                             <a title="View" class="btn btn-xs btn-default edit-row" href="{{ route('backend.user.show', $user->id) }}">
                                 <i class="fa fa-eye"></i>
                             </a>
-                          <a title="Edit" class="btn btn-xs btn-default edit-row" href="{{ route('backend.user.edit', $user->id) }}">
-                              <i class="fa fa-edit"></i>
-                          </a>
+                            @if( Auth::user()->roles[0]->name == ('admin') )
+                                <a title="Edit" class="btn btn-xs btn-default edit-row" href="{{ route('backend.user.edit', $user->id) }}">
+                                <i class="fa fa-edit"></i>
+                                </a>
+                            @endif
                           {{-- {!! Form::open(['method' => 'DELETE', 'route' => ['backend.user.destroy', $user->id], 'class' => 'd_inline_b']) !!}
                               
                                 <button type="submit" class="btn btn-xs btn-danger" onClick="return confirm('Are you sure you want to deactivate?')">

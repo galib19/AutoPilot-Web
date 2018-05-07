@@ -82,7 +82,7 @@
 			</div>
 
 
-			<div class="box_body_section form-group {{ $errors->has('name') ? 'has-error' : '' }}">
+			{{-- <div class="box_body_section form-group {{ $errors->has('name') ? 'has-error' : '' }}">
 				@if( isset($user_meta["profile_pic"]) )
 					<p><img class="img-responsive" src="{{ asset('uploads') }}{{ $user_meta["profile_pic"] }}" alt=""></p>
 				@endif
@@ -92,7 +92,7 @@
 				@if($errors->has('profile_pic'))
 				    <span class="help-block">{{ $errors->first('profile_pic') }}</span>
 				@endif
-			</div>
+			</div> --}}
 
 
 			<div class="box_body_section form-group {{ $errors->has('active') ? 'has-error' : '' }}">

@@ -33,7 +33,7 @@
 							<h3>Ticket Details</h3>
 						</div>
 						<div class="pull-right">
-							@if( check_user_permissions(request(), 'CaseIncedent@edit') )
+							@if( (check_user_permissions(request(), 'CaseIncedent@edit')) && ($cases->case_status == "new"))
 							<a href="{{ route('backend.case.edit', $cases->id) }}" class="btn btn-primary edit_case m_top_15 m_bottom_15"><i class="fa fa-pencil-square-o fa-md"></i>&nbsp; Edit Case</a>
 							@endif
 						</div>
@@ -153,6 +153,7 @@
 								</div>
 								
 							</div>
+							@if(Auth::user()->roles[0]->name != 'client')
 							<div class="row">
 									<div class="col-xs-12">
 										<!-- Additional case information by Admin -->
@@ -188,11 +189,13 @@
 															<button type="button" id="hd_add_case_info_button" data-toggle="modal" data-target="#manager_modal" class="btn btn-primary btn-lg pull-right m_right_15">Re-assign an Engineer</button>
 														@elseif($cases->case_status == 'failed')
 															<button type="button" id="hd_add_case_info_button" data-toggle="modal" data-target="#manager_modal" class="btn btn-primary btn-lg pull-right m_right_15">Re-assign an Engineer</button>
-														@elseif($cases->case_status == 'in-progress') 
+														@elseif(($cases->case_status == 'in-progress') && (Auth::user()->roles[0]->name != 'admin')) 
 															<div class="card bg-warning text-white">
+																<hr>
 																<div class="card-body"><strong> >> THE TICKET IS IN PROGRESS......</strong></div>
 															</div>
-														@elseif($cases->case_status == 'completed')
+														@elseif(($cases->case_status == 'completed') && (Auth::user()->roles[0]->name != 'admin'))
+															
 															<div class="card bg-success text-white">
 																<div class="card-body"><strong>>> THE TICKET IS COMPLETED</strong></div>
 															</div>	
@@ -296,9 +299,9 @@
 															<button type="submit" name="case_status_action" value="failed" class="btn btn-danger btn-lg pull-right ">Cancel Ticket</button>
 															<button type="button" id="hd_add_case_info_button" data-toggle="modal" data-target="#engineer_modal" class="btn btn-success btn-lg pull-right m_right_15">Accept Ticket</button>
 														@elseif($cases->case_status == 'assigned' && Auth::user()->free == 0)
-															<div class="card bg-info text-white">
-																<div class="card-body"><Strong>>> First you have to complete the <span class="label label-info">in-progress</span> ticket, then you can accept this ticket</Strong></div>
-															</div>
+													
+																<div><Strong>>> First you have to complete the <span class="label label-info">in-progress</span> ticket, then you can accept this ticket</Strong></div>
+																<button type="submit" name="case_status_action" value="failed" class="btn btn-danger btn-lg pull-right ">Cancel Ticket</button>
 															
 														@elseif($cases->case_status == 'in-progress')
 															<button type="submit" name="case_status_action" value="completed" class="btn btn-success btn-lg pull-right ">Ticket Completed</button>
@@ -363,9 +366,8 @@
 										</div>
 										<!-- /.box -->
 									</div>
-								 
-								 
 								</div>
+								@endif
 		              	</div>
 			            <!-- /.tab-pane -->
 
