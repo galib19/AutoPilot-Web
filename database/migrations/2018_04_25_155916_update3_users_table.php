@@ -16,7 +16,7 @@ class Update3UsersTable extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dateTime('eta');
             $table->integer('ert');
-             
+           
         });
     }
 
