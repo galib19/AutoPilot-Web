@@ -166,19 +166,74 @@ class PassportController extends Controller
         if ($validator->fails()) {
             return response()->json(['error'=>$validator->errors()], 401);            
         }
-		
 		$case->case_status = "in-progress" ;
 
 		$case->save();
 
-        $user->ert = $request->eta;
-        $user->ert = $request->ert;
+        $user->eta = $request->eta;
+		$user->ert = $request->ert;
+		
+		$user->free = 0; 
 
         $user->save();
 
         return response()->json(['success' => 'Case Update Successfully'], $this->successStatus);
         
     }
+	
+	public function ticketStatusUpdate(Request $request)
+    {
+		$user = Auth::user();
+		
+		$case_id = $request->case_id;
+		
+		$case = CaseIncedent::where('id', $case_id)->first();
+
+		if($case->assigned_engineer_id != $user->id) 
+			return response()->json(['error'=>'Case is not assigned to you'], 404);
+
+        $validator = Validator::make($request->all(), [
+			'case_id' => 'required',
+			'ticket_status'=>'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>$validator->errors()], 401);            
+		}
+		
+		$ticket_status= $request->ticket_status;
+
+		if ($ticket_status == "rejected"){
+			$case->case_status = "acknowledged"; 
+            $case->assigned_engineer_id = null; 
+			$case->save();
+		}
+		else if ($ticket_status == "completed"){
+
+			$case->case_status = "completed";
+			$case->save(); 
+
+			$user->free = 1; 
+			$user->eta = date('2000-01-01');
+			$user->ert = 0;
+			$user->save();
+		}
+		else if ($ticket_status == "failed"){
+
+			$case->case_status = "failed";
+			$case->save(); 
+
+			$user->free = 1; 
+			$user->eta = date('2000-01-01');
+			$user->ert = 0;
+			$user->save();
+		}
+		else 
+			return response()->json(['error'=>'Invalid Ticket status given'], 404);
+
+        return response()->json(['success' => 'Case Update Successfully'], $this->successStatus);
+        
+	}
 	
 	public function allUsers()
     {
@@ -206,6 +261,22 @@ class PassportController extends Controller
         }
         else{
         	return response()->json(['error'=>'Not Found'], 404);
+        }
+
+    }
+
+    public function recentCase()
+    {
+        $user = Auth::user();
+
+        $cases = CaseIncedent::where('assigned_engineer_id', $user->id)->
+                               where('case_status', 'assigned')->latest()->paginate(10)->toArray();
+
+        if( !empty($cases) && $cases != null ){
+            return response()->json(['success' => $cases], $this->successStatus);
+        }
+        else{
+            return response()->json(['error'=>'Not Found'], 404);
         }
 
     }
