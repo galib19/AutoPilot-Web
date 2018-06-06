@@ -27,15 +27,16 @@ Route::post('password/regenerate', 'API\PassportController@resetPasswordPhone');
 
 Route::group(['middleware' => 'auth:api'], function(){
 	Route::post('userme', 'API\PassportController@userMe');
-	Route::post('allusers', 'API\PassportController@allUsers');
 	Route::post('userme/edit', 'API\PassportController@userEdit');
-	Route::post('recentCase', 'API\PassportController@recentCase');
-	Route::post('allcases', 'API\PassportController@allCases');
+	Route::post('recentTicket', 'API\PassportController@recentTicket');
+	Route::post('allTickets', 'API\PassportController@allTickets');
+	Route::post('ticketDetails', 'API\PassportController@ticketDetails');
+	Route::post('ticketDetails/update', 'API\PassportController@ticketUpdate');
+
+	Route::post('allusers', 'API\PassportController@allUsers');
 	Route::post('totalcases', 'API\PassportController@totalCases');
 	Route::post('clientCaseDetails/{id}', 'API\PassportController@clientCaseDetails');
-	Route::post('caseDetails', 'API\PassportController@caseDetails');
-	Route::post('caseDetails/update', 'API\PassportController@caseUpdate');
-	Route::post('caseDetails/statusUpdate', 'API\PassportController@ticketStatusUpdate');
+	Route::post('ticketDetails/statusUpdate', 'API\PassportController@ticketStatusUpdate');
 	Route::post('password/change', 'API\PassportController@changePassword');
 	Route::post('settings', 'API\PassportController@asfSettings');
 	Route::post('create', 'API\PassportController@createCase');

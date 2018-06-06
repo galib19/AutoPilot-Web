@@ -26,7 +26,7 @@ function check_user_permissions($request, $actionName = NULL, $user_id = NULL){
 
 
 
-	if( $controller == 'CaseIncedent' && $method != 'CaseMessageCreate' ){
+	if( $controller == 'Ticket'){
 
 		if( !$currentUser->can("{$controller}_{$method}") ){
 

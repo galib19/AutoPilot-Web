@@ -49,22 +49,16 @@ Route::get('/', 'Backend\HomeController@index')->name('home');
 
 Route::get('/home', 'Backend\HomeController@index')->name('home');
 
+Route::get('import-export-csv-excel',array('as'=>'excel.import','uses'=>'FileController@importExportExcelORCSV'));
+Route::post('import-csv-excel',array('as'=>'import-csv-excel','uses'=>'FileController@importFileIntoDB'));
+Route::get('download-excel-file/{type}', array('as'=>'excel-file','uses'=>'FileController@downloadExcelFile'));
+
 
 Route::group( ['prefix' => 'backend', 'as' => 'backend.', 'namespace' => 'Backend'], function () {
 
-    // Route::group(['as' => 'user.'], function(){
-
-    //     Route::get('custom', [
-    //         'as' => 'custom',
-    //         'uses' => 'UserController@custom'
-    //     ]);     
-
-    //     // Results in backend.user.custom
-
-    // }); 
-
+   
 	// Case Route
-    Route::resource('case','CaseIncedentController');
+    Route::resource('ticket','TicketController');
 
     // users Route
     Route::resource('user','UsersController');
@@ -79,40 +73,11 @@ Route::group( ['prefix' => 'backend', 'as' => 'backend.', 'namespace' => 'Backen
     Route::any('settings', 'SettingsController@index')->name('settings');
 
 
-    // Helpdesk team
-    Route::post('case/updatehd/{id}', 'CaseIncedentController@CaseInfoUpdateHd')->name('case.updatehd');
-    Route::post('case/updateadmin/{id}', 'CaseIncedentController@CaseInfoUpdateAdmin')->name('case.updateadmin');
-    Route::post('case/updateff/{id}', 'CaseIncedentController@CaseInfoUpdateFF')->name('case.updateff');
+    // ticket change status
+    Route::post('ticket/changestatus/{id}', 'TicketController@TicketChangeStatus')->name('ticket.change.status');
+    Route::post('ticket/changestatusmanager/{id}', 'TicketController@TicketChangeStatusManager')->name('ticket.change.statusmanager');
 
-    Route::post('case/message/create/{id}', 'CaseIncedentController@CaseMessageCreate')->name('case.message.create');
-
-    // case change status
-    Route::post('case/changestatus/{id}', 'CaseIncedentController@CaseChangeStatus')->name('case.change.status');
-    Route::post('case/changestatusmanager/{id}', 'CaseIncedentController@CaseChangeStatusManager')->name('case.change.statusmanager');
-
-
+    
   
 });
 
-
-
-
-
-
-// Route::get('/sparkpost', function() {
-
-//   Mail::send('emails.test', [], function($message) {
-//     $message
-//     	->from('from@yourdomain.com', 'Your Name')
-//       	->to('to@otherdomain.com', 'Receiver Name')
-//       	->subject('From SparkPost with ❤');
-//   });
-
-// });
-
-
-
-// Route::any('{all}', function(){
-//     return '404 Error';
-//     // return view('errors.404');
-// })->where('all', '.*');

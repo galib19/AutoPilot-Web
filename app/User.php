@@ -19,7 +19,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'phone', 'email', 'password', 'active', 'available', 'eta', 'ert'
+        'name', 'phone', 'email', 'password', 'active', 'free', 'eta', 'ert'
     ];
 
     /**
@@ -30,26 +30,15 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
-
-
-    public function cases(){
-    	return $this->hasMany(CaseIncedent::class, 'user_id');
+ 
+    public function tickets(){
+    	return $this->hasMany(Ticket::class, 'user_id');
     }
 
     public function usermeta(){
     	return $this->hasMany(UserMeta::class, 'user_id');
     }
-
-
-    public function casevictim()
-    {
-        return $this->hasManyThrough(CaseVictim::class, CaseIncedent::class);
-    }
-
-
-    public function casecomment(){
-    	return $this->hasMany(CaseComment::class, 'user_id');
-    }
+ 
 
     // public function userrole(){
     // 	return $this->hasManyThrough(Role::class, 'user_id');

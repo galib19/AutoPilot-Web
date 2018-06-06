@@ -8,12 +8,12 @@ use App\User;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 
-use App\CaseIncedent;
-use App\CaseMeta;
-use App\CaseVictim;
+use App\Ticket;
+use App\Site;
+ 
 use App\UserMeta;
 use App\AsfOption;
-use App\CaseComment;
+ 
 
 use Illuminate\Validation\Rule;
 
@@ -31,7 +31,7 @@ class PassportController extends Controller
 {
 
     public $successStatus = 200;
-    protected $case_status = 'new';
+    protected $ticket_status = 'new';
     protected $uploadPath;
     protected $uploadUrl;
 
@@ -56,10 +56,13 @@ class PassportController extends Controller
      */
     public function login(){
 
+		
+
         if(Auth::attempt(['phone' => request()->input('phone'), 'password' => request()->input('password'), 'active' => 1])){
-
-            $user = Auth::user();
-
+			
+			$user = Auth::user();
+			//dd($user);
+			 
             $success['token'] =  $user->createToken('MyApp')->accessToken;
             return response()->json(['success' => $success], $this->successStatus);
         }
@@ -104,16 +107,8 @@ class PassportController extends Controller
     {
         $user = Auth::user();
 
-
-        //$user_meta = User::with('usermeta')->find($user->id);
-
-        //CaseMeta::where('case_id', '=', $id)->where('meta_key', 'like', $value['meta_key'])
-
         $user_metas = UserMeta::where('user_id', $user->id)->get(['meta_key', 'meta_value'])->toArray();
 
-        //dd($user_meta);
-
-        
         $destination_url = $this->uploadUrl;
 
         $user_meta_data = array();
@@ -146,29 +141,29 @@ class PassportController extends Controller
     }
 
 	
-	public function caseUpdate(Request $request)
+	public function ticketUpdate(Request $request)
     {
 		$user = Auth::user();
 		
-		$case_id = $request->case_id;
+		$ticket_id = $request->ticket_id;
 		
-		$case = CaseIncedent::where('id', $case_id)->first();
+		$ticket = Ticket::where('id', $ticket_id)->first();
 
-		if($case->assigned_engineer_id != $user->id) 
-			return response()->json(['error'=>'Case is not assigned to you'], 404);
+		if($ticket->assigned_engineer_id != $user->id) 
+			return response()->json(['error'=>'Ticket is not assigned to you'], 404);
 
         $validator = Validator::make($request->all(), [
             'eta' 			=> 'required',
 			'ert' 		=> 'required|integer',
-			'case_id' => 'required'
+			'ticket_id' => 'required'
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error'=>$validator->errors()], 401);            
         }
-		$case->case_status = "in-progress" ;
+		$ticket->ticket_status = "in-progress" ;
 
-		$case->save();
+		$ticket->save();
 
         $user->eta = $request->eta;
 		$user->ert = $request->ert;
@@ -177,7 +172,7 @@ class PassportController extends Controller
 
         $user->save();
 
-        return response()->json(['success' => 'Case Update Successfully'], $this->successStatus);
+        return response()->json(['success' => 'Ticket Update Successfully'], $this->successStatus);
         
     }
 	
@@ -185,15 +180,15 @@ class PassportController extends Controller
     {
 		$user = Auth::user();
 		
-		$case_id = $request->case_id;
+		$ticket_id = $request->ticket_id;
 		
-		$case = CaseIncedent::where('id', $case_id)->first();
+		$ticket = Ticket::where('id', $ticket_id)->first();
 
-		if($case->assigned_engineer_id != $user->id) 
-			return response()->json(['error'=>'Case is not assigned to you'], 404);
+		if($ticket->assigned_engineer_id != $user->id) 
+			return response()->json(['error'=>'Ticket is not assigned to you'], 404);
 
         $validator = Validator::make($request->all(), [
-			'case_id' => 'required',
+			'ticket_id' => 'required',
 			'ticket_status'=>'required'
         ]);
 
@@ -204,14 +199,14 @@ class PassportController extends Controller
 		$ticket_status= $request->ticket_status;
 
 		if ($ticket_status == "rejected"){
-			$case->case_status = "acknowledged"; 
-            $case->assigned_engineer_id = null; 
-			$case->save();
+			$ticket->ticket_status = "acknowledged"; 
+            $ticket->assigned_engineer_id = null; 
+			$ticket->save();
 		}
 		else if ($ticket_status == "completed"){
 
-			$case->case_status = "completed";
-			$case->save(); 
+			$ticket->ticket_status = "completed";
+			$ticket->save(); 
 
 			$user->free = 1; 
 			$user->eta = date('2000-01-01');
@@ -220,8 +215,8 @@ class PassportController extends Controller
 		}
 		else if ($ticket_status == "failed"){
 
-			$case->case_status = "failed";
-			$case->save(); 
+			$ticket->ticket_status = "failed";
+			$ticket->save(); 
 
 			$user->free = 1; 
 			$user->eta = date('2000-01-01');
@@ -231,7 +226,7 @@ class PassportController extends Controller
 		else 
 			return response()->json(['error'=>'Invalid Ticket status given'], 404);
 
-        return response()->json(['success' => 'Case Update Successfully'], $this->successStatus);
+        return response()->json(['success' => 'Ticket Update Successfully'], $this->successStatus);
         
 	}
 	
@@ -250,14 +245,14 @@ class PassportController extends Controller
 
     }
 
-	public function allCases()
+	public function allTickets()
     {
         $user = Auth::user();
 
-        $cases = CaseIncedent::where('assigned_engineer_id', $user->id)->latest()->paginate(10)->toArray();
+        $tickets = Ticket::where('assigned_engineer_id', $user->id)->latest()->paginate(10)->toArray();
 
-        if( !empty($cases) && $cases != null ){
-        	return response()->json(['success' => $cases], $this->successStatus);
+        if( !empty($tickets) && $tickets != null ){
+        	return response()->json(['success' => $tickets], $this->successStatus);
         }
         else{
         	return response()->json(['error'=>'Not Found'], 404);
@@ -265,19 +260,48 @@ class PassportController extends Controller
 
     }
 
-    public function recentCase()
+    public function recentTicket()
     {
         $user = Auth::user();
 
-        $cases = CaseIncedent::where('assigned_engineer_id', $user->id)->
-                               where('case_status', 'assigned')->latest()->paginate(10)->toArray();
+        $tickets = Ticket::where('assigned_engineer_id', $user->id)->
+                               where('ticket_status', 'assigned')->latest()->paginate(10)->toArray();
 
-        if( !empty($cases) && $cases != null ){
-            return response()->json(['success' => $cases], $this->successStatus);
+        if( !empty($tickets) && $tickets != null ){
+            return response()->json(['success' => $tickets], $this->successStatus);
         }
         else{
             return response()->json(['error'=>'Not Found'], 404);
         }
+
+	}
+	
+	public function ticketDetails(Request $request){
+
+    	
+		$user = Auth::user();
+		
+		$ticket_id = $request->ticket_id;
+
+		$tickets = Ticket::where('assigned_engineer_id', $user->id)->find($ticket_id);
+		
+		$site = Site::with('ticket')->find($tickets->site_id);
+
+		//dd($site->id);
+
+    	if( !empty($tickets) && $tickets != null ){
+
+			$tickets = $tickets->toArray();
+			
+		 
+
+    		return response()->json(['success' => $site], $this->successStatus);
+    	}
+    	else{
+    		return response()->json(['error'=>'Not Found'], 404);
+    	}
+
+    	//return View::make('backend.ticket.show', ['tickets' => $tickets, 'tickets_meta' => $tickets_meta]);
 
     }
 
@@ -288,10 +312,10 @@ class PassportController extends Controller
         //dd($request->all());
 
         $validator = Validator::make($request->all(), [
-            'case_title'        	=> 'required|string',
-            'case_details'         	=> 'required',
-            //'case_status'         	=> 'string',
-            'case_type'         	=> 'required|string',
+            'ticket_title'        	=> 'required|string',
+            'ticket_details'         	=> 'required',
+            //'ticket_status'         	=> 'string',
+            'ticket_type'         	=> 'required|string',
             'incident_date'  		=> 'required',
             'name'  				=> 'required|string',
             'parents'  				=> 'required',
@@ -308,11 +332,11 @@ class PassportController extends Controller
 
         $data = $this->handleRequest($request);
 
-        $data['case_status'] = $this->case_status;
+        $data['ticket_status'] = $this->ticket_status;
 
-        $data = Auth::user()->cases()->create($data);
+        $data = Auth::user()->tickets()->create($data);
 
-        //$data = Auth::user()->casevictim()->create($data_victim);
+        //$data = Auth::user()->ticketvictim()->create($data_victim);
 
         $data_victim = $this->handleVictimRequest($request, $data->id);
 
@@ -340,9 +364,9 @@ class PassportController extends Controller
     private function handleRequest($request)
     {
 
-    	$data['case_title'] = $request->input('case_title');
-    	$data['case_details'] = $request->input('case_details');
-    	$data['case_type'] = $request->input('case_type');
+    	$data['ticket_title'] = $request->input('ticket_title');
+    	$data['ticket_details'] = $request->input('ticket_details');
+    	$data['ticket_type'] = $request->input('ticket_type');
     	$data['incident_date'] = $request->input('incident_date');
     	$data['action_taken'] = $request->input('action_taken');
 
@@ -353,30 +377,30 @@ class PassportController extends Controller
         return $data;
     }
 
-    private function handleVictimRequest($request, $case_id){
+    private function handleVictimRequest($request, $ticket_id){
 
-    	$data_case_victim = array();
+    	$data_ticket_victim = array();
 
-    	if(isset($case_id) && !empty($case_id)){
-    		$data_case_victim['case_id'] = $case_id;
-    		$data_case_victim['name'] = $request->input('name');
-    		$data_case_victim['parents'] = $request->input('parents');
-    		$data_case_victim['location'] = $request->input('location');
-    		$data_case_victim['age'] = $request->input('age');
-    		$data_case_victim['sex'] = $request->input('sex');
+    	if(isset($ticket_id) && !empty($ticket_id)){
+    		$data_ticket_victim['ticket_id'] = $ticket_id;
+    		$data_ticket_victim['name'] = $request->input('name');
+    		$data_ticket_victim['parents'] = $request->input('parents');
+    		$data_ticket_victim['location'] = $request->input('location');
+    		$data_ticket_victim['age'] = $request->input('age');
+    		$data_ticket_victim['sex'] = $request->input('sex');
     	}
 
-    	return $data_case_victim;
+    	return $data_ticket_victim;
 
     }
 
 
 
 
-    // Save additional field to case meta 
+    // Save additional field to ticket meta 
     private function saveOtherField($request, $id){
 
-    	$data_other_field = $request->except(['case_title', 'case_details', 'name', 'parents', 'location', 'age', 'sex', 'case_status', 'user_id', 'incident_info', 'case_type', 'incident_date', 'action_taken' ]);
+    	$data_other_field = $request->except(['ticket_title', 'ticket_details', 'name', 'parents', 'location', 'age', 'sex', 'ticket_status', 'user_id', 'incident_info', 'ticket_type', 'incident_date', 'action_taken' ]);
 
 
     	$newArrayFieldNormal = array();
@@ -419,12 +443,12 @@ class PassportController extends Controller
 
 
     // Get Additional Normal Field to Case meta
-    private function saveOtherFieldNormal($request, $case_id, $key, $value){
+    private function saveOtherFieldNormal($request, $ticket_id, $key, $value){
 
     	$new_other_filed = array();
 
     	if(isset($key) && !empty($key)){
-    		$new_other_filed['case_id'] = $case_id;
+    		$new_other_filed['ticket_id'] = $ticket_id;
     		$new_other_filed['user_id'] = $request->user()->id;
     		$new_other_filed['meta_key'] = $key;
     		$new_other_filed['meta_value'] = ( !empty($value) ? $value : null );
@@ -437,7 +461,7 @@ class PassportController extends Controller
 
 
     // Save attachment multiple file and image request as array
-    private function saveOtherFieldMultiFiles($request, $case_id, $key, $value){
+    private function saveOtherFieldMultiFiles($request, $ticket_id, $key, $value){
     	
     	$new_multi_files_array = array();
 
@@ -517,7 +541,7 @@ class PassportController extends Controller
 
 
 
-					    $new_image_array_single['case_id'] = $case_id;
+					    $new_image_array_single['ticket_id'] = $ticket_id;
 					    $new_image_array_single['user_id'] = Auth::user()->id;
 					    $new_image_array_single['meta_key'] = 'multi_files'. $is_file . $key;
 					    $new_image_array_single['meta_value'] = ( !empty($file_path . $fileName) ? $file_path . $fileName : null );
@@ -543,7 +567,7 @@ class PassportController extends Controller
 
 
     // Get Additional Files Field to Case meta
-    private function saveOtherFieldfiles($request, $case_id, $key, $value){
+    private function saveOtherFieldfiles($request, $ticket_id, $key, $value){
 
     	
 
@@ -617,7 +641,7 @@ class PassportController extends Controller
 
 				    //$new_image_array[$key] = $file_path . $fileName;
 
-				    $new_image_array_single['case_id'] = $case_id;
+				    $new_image_array_single['ticket_id'] = $ticket_id;
 				    $new_image_array_single['user_id'] = $request->user()->id;
 				    $new_image_array_single['meta_key'] = $is_file . $key;
 				    $new_image_array_single['meta_value'] = ( !empty($file_path . $fileName) ? $file_path . $fileName : null );
@@ -674,83 +698,54 @@ class PassportController extends Controller
     	return $check_valid_mime_type;
 	}
 	
-	public function caseDetails(Request $request){
-
-    	
-		$user = Auth::user();
-		
-		$case_id = $request->case_id;
-
-    	$cases = CaseIncedent::where('assigned_engineer_id', $user->id)->find($case_id);
-
-    	//$cases_meta = CaseIncedent::with('casemeta')->find($id);
-
-    	//dd($cases);
-    	
-
-    	if( !empty($cases) && $cases != null ){
-
-    		$cases = $cases->toArray();
-
-    		$final_cases = $this->caseDetailsWithVictim($cases);
-    		$final_cases_last = $this->caseDetailsWithMeta($final_cases);
-
-    		return response()->json(['success' => $final_cases_last], $this->successStatus);
-    	}
-    	else{
-    		return response()->json(['error'=>'Not Found'], 404);
-    	}
-
-    	//return View::make('backend.case.show', ['cases' => $cases, 'cases_meta' => $cases_meta]);
-
-    }
+	
 
     //Case details show
     public function clientCaseDetails($id){
 
     	$user = Auth::user();
 
-    	$cases = CaseIncedent::where('user_id', $user->id)->find($id);
+    	$tickets = Ticket::where('user_id', $user->id)->find($id);
 
-    	//$cases_meta = CaseIncedent::with('casemeta')->find($id);
+    	//$tickets_meta = Ticket::with('ticketmeta')->find($id);
 
-    	//dd($cases);
+    	//dd($tickets);
     	
 
-    	if( !empty($cases) && $cases != null ){
+    	if( !empty($tickets) && $tickets != null ){
 
-    		$cases = $cases->toArray();
+    		$tickets = $tickets->toArray();
 
-    		$final_cases = $this->caseDetailsWithVictim($cases);
-    		$final_cases_last = $this->caseDetailsWithMeta($final_cases);
+    		$final_tickets = $this->ticketDetailsWithVictim($tickets);
+    		$final_tickets_last = $this->ticketDetailsWithMeta($final_tickets);
 
-    		return response()->json(['success' => $final_cases_last], $this->successStatus);
+    		return response()->json(['success' => $final_tickets_last], $this->successStatus);
     	}
     	else{
     		return response()->json(['error'=>'Not Found'], 404);
     	}
 
-    	//return View::make('backend.case.show', ['cases' => $cases, 'cases_meta' => $cases_meta]);
+    	//return View::make('backend.ticket.show', ['tickets' => $tickets, 'tickets_meta' => $tickets_meta]);
 
     }
 
     // Cases with victim data
-    private function caseDetailsWithVictim($cases){
+    private function ticketDetailsWithVictim($tickets){
 
-    	$cases_victim = CaseVictim::where('case_id', $cases['id'])->get([ 'id', 'name', 'parents', 'location', 'age', 'sex'])->toArray();
+    	$tickets_victim = CaseVictim::where('ticket_id', $tickets['id'])->get([ 'id', 'name', 'parents', 'location', 'age', 'sex'])->toArray();
 
-    	//$cases_to_array = $cases->toArray();
+    	//$tickets_to_array = $tickets->toArray();
 
-    	$final_cases_last = array_merge($cases, array('victims' => $cases_victim));
+    	$final_tickets_last = array_merge($tickets, array('victims' => $tickets_victim));
 
-    	return $final_cases_last;
+    	return $final_tickets_last;
 
     }
 
     // Cases with attachemnt meta
-   	private function caseDetailsWithMeta($cases){
+   	private function ticketDetailsWithMeta($tickets){
 
-   		$cases_meta = CaseMeta::where('case_id', $cases['id'])->get([ 'id', 'meta_key', 'meta_value'])->toArray();
+   		$tickets_meta = CaseMeta::where('ticket_id', $tickets['id'])->get([ 'id', 'meta_key', 'meta_value'])->toArray();
 
    		$destination_url = $this->uploadUrl;
 
@@ -758,7 +753,7 @@ class PassportController extends Controller
    		$multiple_files_image = array();
    		$new_multiple_files_image = array();
 
-   		foreach ($cases_meta as $key => $value) {
+   		foreach ($tickets_meta as $key => $value) {
    			
    			$str_to_check = 'multi_files';
 
@@ -782,11 +777,11 @@ class PassportController extends Controller
 
    		
 
-   		//$cases_to_array = $cases->toArray();
+   		//$tickets_to_array = $tickets->toArray();
 
-   		$final_cases_last = array_merge($cases, array('attachement' => $new_multiple_files_image, 'other_filed' => $other_fields));
+   		$final_tickets_last = array_merge($tickets, array('attachement' => $new_multiple_files_image, 'other_filed' => $other_fields));
 
-   		return $final_cases_last;
+   		return $final_tickets_last;
 
    	} 
 
@@ -921,7 +916,7 @@ class PassportController extends Controller
         $all_request = (object)$request->json()->all();
 
         $validator = Validator::make($request->json()->all(), [
-            'case_id' 			=> 'required|integer',
+            'ticket_id' 			=> 'required|integer',
             'comment_content' 	=> 'required|max:800',
         ]);
 
@@ -929,24 +924,24 @@ class PassportController extends Controller
             return response()->json(['error'=>$validator->errors()], 401);            
         }
 
-        $data['case_id'] = $all_request->case_id;
+        $data['ticket_id'] = $all_request->ticket_id;
         $data['user_id'] = $user->id;
         $data['comment_content'] = $all_request->comment_content;
 
-        $caseComment = new CaseComment;
+        $ticketComment = new CaseComment;
 
-        $caseComment->case_id = $all_request->case_id;
-        $caseComment->user_id = $user->id;
-        //$caseComment->comment_content = htmlspecialchars($all_request->comment_content, ENT_QUOTES);
-        $caseComment->comment_content = filter_var($all_request->comment_content, FILTER_SANITIZE_STRING);
+        $ticketComment->ticket_id = $all_request->ticket_id;
+        $ticketComment->user_id = $user->id;
+        //$ticketComment->comment_content = htmlspecialchars($all_request->comment_content, ENT_QUOTES);
+        $ticketComment->comment_content = filter_var($all_request->comment_content, FILTER_SANITIZE_STRING);
 
 
-        $caseComment->save();
+        $ticketComment->save();
 
-        $all_case_comment = CaseComment::where('case_id', $all_request->case_id)->count();
+        $all_ticket_comment = CaseComment::where('ticket_id', $all_request->ticket_id)->count();
 
         $success['message'] = 'Message Created Successfully'; 
-        $success['total_comments'] = isset($all_case_comment) ? $all_case_comment : 0; 
+        $success['total_comments'] = isset($all_ticket_comment) ? $all_ticket_comment : 0; 
 
         return response()->json(['success' => $success], $this->successStatus);
 
@@ -955,35 +950,35 @@ class PassportController extends Controller
 
 
 	// Create comment / Message
-	public function messageAll($case_id){
+	public function messageAll($ticket_id){
 
-		if ( empty($case_id) || $case_id == null ) {
+		if ( empty($ticket_id) || $ticket_id == null ) {
 		 	return response()->json(['error'=>'Case Id not found'], 404);            
 		}
 
 		$user = Auth::user();
 
 
-		$case_comments = CaseComment::where('case_id', $case_id)->with('user')->latest()->paginate(10);
+		$ticket_comments = CaseComment::where('ticket_id', $ticket_id)->with('user')->latest()->paginate(10);
 
 		
-		$new_case_comments = array();
-		$new_case_comments_last = array();
+		$new_ticket_comments = array();
+		$new_ticket_comments_last = array();
 
-		if( !empty($case_comments) && $case_comments != null ){
+		if( !empty($ticket_comments) && $ticket_comments != null ){
 
-			$case_comments = $case_comments->toArray();
+			$ticket_comments = $ticket_comments->toArray();
 
-			foreach ($case_comments['data'] as $key => $value) {
+			foreach ($ticket_comments['data'] as $key => $value) {
 				
 				//dump($value['user']['id']);
 
-				$new_case_comments['id'] = $value['id'];
-				$new_case_comments['case_id'] = $value['case_id'];
-				$new_case_comments['user_id'] = $value['user_id'];
-				$new_case_comments['comment_content'] = $value['comment_content'];
-				$new_case_comments['comment_date'] = $value['created_at'];
-				$new_case_comments['user_name'] = $value['user']['name'];
+				$new_ticket_comments['id'] = $value['id'];
+				$new_ticket_comments['ticket_id'] = $value['ticket_id'];
+				$new_ticket_comments['user_id'] = $value['user_id'];
+				$new_ticket_comments['comment_content'] = $value['comment_content'];
+				$new_ticket_comments['comment_date'] = $value['created_at'];
+				$new_ticket_comments['user_name'] = $value['user']['name'];
 
 				$user_profiles = UserMeta::where('user_id' , $value['user']['id'])->get(['meta_key', 'meta_value'])->toArray();
 
@@ -996,26 +991,26 @@ class PassportController extends Controller
 
 
 				if ( !empty($new_array_profiles) && $new_array_profiles != null  ) {
-					$new_case_comments['user_designation'] = $new_array_profiles['designation'];
+					$new_ticket_comments['user_designation'] = $new_array_profiles['designation'];
 
 					$profile_pic_with_url = unserialize($new_array_profiles['profile_pic']);
 
-					$new_case_comments['user_profile_pic'] = $this->uploadUrl . $profile_pic_with_url['url_thumb'];
+					$new_ticket_comments['user_profile_pic'] = $this->uploadUrl . $profile_pic_with_url['url_thumb'];
 
 				}
 				else{
-					$new_case_comments['user_designation'] = null;
-					$new_case_comments['user_profile_pic'] = null;
+					$new_ticket_comments['user_designation'] = null;
+					$new_ticket_comments['user_profile_pic'] = null;
 				}
 
 
-				$new_case_comments_last[] = $new_case_comments;
+				$new_ticket_comments_last[] = $new_ticket_comments;
 				
 
 				
 			} // foreach
 
-			//print_r($new_case_comments_last);
+			//print_r($new_ticket_comments_last);
 		}
 		else{
 			return response()->json(['error'=>'No Comments Found'], 404); 
@@ -1024,31 +1019,31 @@ class PassportController extends Controller
 		
 
 
-		// $case_comments = DB::table('case_comments')
-		// 		            ->leftJoin('users', 'case_comments.user_id', '=', 'users.id')
-		// 		            ->leftJoin('user_metas', 'case_comments.user_id', '=', 'user_metas.user_id')
-		// 		            ->select('case_comments.*', 'users.name', 'user_metas.meta_key', 'user_metas.meta_value')
-		// 		            ->where('case_comments.case_id', '=', $case_id)
+		// $ticket_comments = DB::table('ticket_comments')
+		// 		            ->leftJoin('users', 'ticket_comments.user_id', '=', 'users.id')
+		// 		            ->leftJoin('user_metas', 'ticket_comments.user_id', '=', 'user_metas.user_id')
+		// 		            ->select('ticket_comments.*', 'users.name', 'user_metas.meta_key', 'user_metas.meta_value')
+		// 		            ->where('ticket_comments.ticket_id', '=', $ticket_id)
 		// 		            //->where('user_metas.meta_key', 'like', 'profile_pic')
 		// 		            ->paginate(10)->toArray();
 
 		
 
-		$final_cases_last = array_merge( $case_comments, array('data' => $new_case_comments_last ));
+		$final_tickets_last = array_merge( $ticket_comments, array('data' => $new_ticket_comments_last ));
 
-		return response()->json(['success' => $final_cases_last], $this->successStatus);
+		return response()->json(['success' => $final_tickets_last], $this->successStatus);
 
 	}
 
 
-	// Get total comment by case id
-	private function totalCommentsByCaseId($case_id){
+	// Get total comment by ticket id
+	private function totalCommentsByCaseId($ticket_id){
 
-		if( isset($case_id) && !empty($case_id) ){
+		if( isset($ticket_id) && !empty($ticket_id) ){
 
-			$caseComment = CaseComment::where('case_id', $case_id)->count();
+			$ticketComment = CaseComment::where('ticket_id', $ticket_id)->count();
 
-			return $caseComment;
+			return $ticketComment;
 
 		}
 		else{

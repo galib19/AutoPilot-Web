@@ -17,10 +17,9 @@ class DatabaseSeeder extends Seeder
 		DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
 
-        //$this->call(UsersTableDataSeeder::class);
-        //$this->call(CaseIncedentTableDataSeeder::class);
-        //$this->call(CaseVictimTableDataSeeder::class);
-        //$this->call(RolesTableSeeder::class);
+        $this->call(UsersTableDataSeeder::class);
+        //$this->call(TicketsTableSeeder::class);
+        $this->call(RolesTableSeeder::class);
         $this->call(PermissionsTableSeeder::class);
 
         // To only apply to a single connection and reset it's self

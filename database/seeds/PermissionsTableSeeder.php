@@ -19,72 +19,55 @@ class PermissionsTableSeeder extends Seeder
         //Cases Permissions
 
         // Show all Case 
-    	$CaseIncedent_index = new Permission();
-    	$CaseIncedent_index->name = 'CaseIncedent_index';
-    	$CaseIncedent_index->save();
+    	$Ticket_index = new Permission();
+    	$Ticket_index->name = 'Ticket_index';
+    	$Ticket_index->save();
 
 
     	// Create case
-    	$CaseIncedent_create = new Permission();
-    	$CaseIncedent_create->name = 'CaseIncedent_create';
-    	$CaseIncedent_create->save();
+    	$Ticket_create = new Permission();
+    	$Ticket_create->name = 'Ticket_create';
+    	$Ticket_create->save();
 
     	// Store create case
-    	$CaseIncedent_store = new Permission();
-    	$CaseIncedent_store->name = 'CaseIncedent_store';
-    	$CaseIncedent_store->save();
+    	$Ticket_store = new Permission();
+    	$Ticket_store->name = 'Ticket_store';
+    	$Ticket_store->save();
 
 
     	// Show case Details
-    	$CaseIncedent_show = new Permission();
-    	$CaseIncedent_show->name = 'CaseIncedent_show';
-    	$CaseIncedent_show->save();
+    	$Ticket_show = new Permission();
+    	$Ticket_show->name = 'Ticket_show';
+    	$Ticket_show->save();
 
 
 
     	// Edit / Update Case
-    	$CaseIncedent_edit = new Permission();
-    	$CaseIncedent_edit->name = 'CaseIncedent_edit';
-    	$CaseIncedent_edit->save();
+    	$Ticket_edit = new Permission();
+    	$Ticket_edit->name = 'Ticket_edit';
+    	$Ticket_edit->save();
 
 
-    	$CaseIncedent_update = new Permission();
-    	$CaseIncedent_update->name = 'CaseIncedent_update';
-    	$CaseIncedent_update->save();
+    	$Ticket_update = new Permission();
+    	$Ticket_update->name = 'Ticket_update';
+    	$Ticket_update->save();
 
 
 
     	// Destory/ Delete case
-    	$CaseIncedent_destroy = new Permission();
-    	$CaseIncedent_destroy->name = 'CaseIncedent_destroy';
-    	$CaseIncedent_destroy->save();
-
-
-    	// Help Desk Case Update
-    	$CaseIncedent_CaseInfoUpdateHd = new Permission();
-    	$CaseIncedent_CaseInfoUpdateHd->name = 'CaseIncedent_CaseInfoUpdateHd';
-    	$CaseIncedent_CaseInfoUpdateHd->save();
-
-    	// Fact Finding Case Update
-    	$CaseIncedent_CaseInfoUpdateFF = new Permission();
-    	$CaseIncedent_CaseInfoUpdateFF->name = 'CaseIncedent_CaseInfoUpdateFF';
-    	$CaseIncedent_CaseInfoUpdateFF->save();
-
-    	// Admin Case Update
-    	$CaseIncedent_CaseInfoUpdateAdmin = new Permission();
-    	$CaseIncedent_CaseInfoUpdateAdmin->name = 'CaseIncedent_CaseInfoUpdateAdmin';
-    	$CaseIncedent_CaseInfoUpdateAdmin->save();
-
+    	$Ticket_destroy = new Permission();
+    	$Ticket_destroy->name = 'Ticket_destroy';
+    	$Ticket_destroy->save();
 
     	// mark as open case
-    	$CaseIncedent_CaseChangeStatus = new Permission();
-    	$CaseIncedent_CaseChangeStatus->name = 'CaseIncedent_CaseChangeStatus';
-    	$CaseIncedent_CaseChangeStatus->save();
+    	$Ticket_TicketChangeStatus = new Permission();
+    	$Ticket_TicketChangeStatus->name = 'Ticket_TicketChangeStatus';
+    	$Ticket_TicketChangeStatus->save();
 
     	// mark as archive case
-    	$CaseIncedent_CaseChangeStatusManager = new Permission();
-    	$CaseIncedent_CaseChangeStatusManager->name = 'CaseIncedent_CaseChangeStatusManager';
-    	$CaseIncedent_CaseChangeStatusManager->save();
+    	$Ticket_TicketChangeStatusManager = new Permission();
+    	$Ticket_TicketChangeStatusManager->name = 'Ticket_TicketChangeStatusManager';
+    	$Ticket_TicketChangeStatusManager->save();
 
    
     	
@@ -149,18 +132,15 @@ class PermissionsTableSeeder extends Seeder
 
     	// Detach Role
     	$all_permissions = [
-    		$CaseIncedent_store,
-    		$CaseIncedent_index,
-    		$CaseIncedent_CaseChangeStatus,
-    		$CaseIncedent_CaseChangeStatusManager,
-    		$CaseIncedent_create,
-    		$CaseIncedent_CaseInfoUpdateAdmin,
-    		$CaseIncedent_CaseInfoUpdateFF,
-    		$CaseIncedent_CaseInfoUpdateHd,
-    		$CaseIncedent_update,
-    		$CaseIncedent_destroy,
-    		$CaseIncedent_show,
-    		$CaseIncedent_edit,
+    		$Ticket_store,
+    		$Ticket_index,
+    		$Ticket_TicketChangeStatus,
+    		$Ticket_TicketChangeStatusManager,
+    		$Ticket_create,
+    		$Ticket_update,
+    		$Ticket_destroy,
+    		$Ticket_show,
+    		$Ticket_edit,
     		$Users_store,
     		$Users_index,
     		$Users_create,
@@ -180,18 +160,15 @@ class PermissionsTableSeeder extends Seeder
 
     	// Attach role
     	$admin->attachPermissions([
-    		$CaseIncedent_index,
-    		$CaseIncedent_create,
-    		$CaseIncedent_store,
-    		$CaseIncedent_edit,
-    		$CaseIncedent_update,
-    		$CaseIncedent_show,
-    		//$CaseIncedent_destroy,
-    		$CaseIncedent_CaseInfoUpdateHd,
-    		$CaseIncedent_CaseInfoUpdateFF,
-    		$CaseIncedent_CaseInfoUpdateAdmin,
-    		$CaseIncedent_CaseChangeStatus,
-    		$CaseIncedent_CaseChangeStatusManager,
+    		$Ticket_index,
+    		$Ticket_create,
+    		$Ticket_store,
+    		$Ticket_edit,
+    		$Ticket_update,
+    		$Ticket_show,
+    		$Ticket_destroy,
+    		$Ticket_TicketChangeStatus,
+    		$Ticket_TicketChangeStatusManager,
 
     		// users
     		$Users_index,
@@ -208,18 +185,15 @@ class PermissionsTableSeeder extends Seeder
     	]);
 
     	$manager->attachPermissions([
-    		$CaseIncedent_index,
-    		//$CaseIncedent_create,
-    		//$CaseIncedent_store,
-    		//$CaseIncedent_edit,
-    		//$CaseIncedent_update,
-    		$CaseIncedent_show,
-    		//$CaseIncedent_destroy,
-    		//$CaseIncedent_CaseInfoUpdateHd,
-    		//$CaseIncedent_CaseInfoUpdateFF,
-    		$CaseIncedent_CaseInfoUpdateAdmin,
-    		//$CaseIncedent_CaseChangeStatus,
-    		$CaseIncedent_CaseChangeStatusManager,
+    		$Ticket_index,
+    		//$Ticket_create,
+    		//$Ticket_store,
+    		//$Ticket_edit,
+    		//$Ticket_update,
+    		$Ticket_show,
+    		//$Ticket_destroy,
+    		//$Ticket_TicketChangeStatus,
+    		$Ticket_TicketChangeStatusManager,
 
     		// users
     		$Users_index,
@@ -236,18 +210,15 @@ class PermissionsTableSeeder extends Seeder
     	]);
 
     	$engineer->attachPermissions([
-    		$CaseIncedent_index,
-    		//$CaseIncedent_create,
-    		//$CaseIncedent_store,
-    		//$CaseIncedent_edit,
-    		//$CaseIncedent_update,
-    		$CaseIncedent_show,
-    		//$CaseIncedent_destroy,
-    		//$CaseIncedent_CaseInfoUpdateHd,
-    		$CaseIncedent_CaseInfoUpdateFF,
-    		//$CaseIncedent_CaseInfoUpdateAdmin,
-    		$CaseIncedent_CaseChangeStatus,
-    		//$CaseIncedent_CaseChangeStatusManager,
+    		$Ticket_index,
+    		//$Ticket_create,
+    		//$Ticket_store,
+    		//$Ticket_edit,
+    		//$Ticket_update,
+    		$Ticket_show,
+    		//$Ticket_destroy,
+    		$Ticket_TicketChangeStatus,
+    		//$Ticket_TicketChangeStatusManager,
 
     		// users
     		//$Users_index,
@@ -263,18 +234,15 @@ class PermissionsTableSeeder extends Seeder
     	]);
 
     	$client->attachPermissions([
-    		$CaseIncedent_index,
-    		$CaseIncedent_create,
-    		$CaseIncedent_store,
-    		$CaseIncedent_edit,
-    		$CaseIncedent_update,
-    		$CaseIncedent_show,
-    		//$CaseIncedent_destroy,
-    		//$CaseIncedent_CaseInfoUpdateHd,
-    		//$CaseIncedent_CaseInfoUpdateFF,
-    		//$CaseIncedent_CaseInfoUpdateAdmin,
-    		// $CaseIncedent_CaseChangeStatus,
-    		//$CaseIncedent_CaseChangeStatusManager,
+    		$Ticket_index,
+    		$Ticket_create,
+    		$Ticket_store,
+    		$Ticket_edit,
+    		$Ticket_update,
+    		$Ticket_show,
+    		//$Ticket_destroy,
+    		// $Ticket_TicketChangeStatus,
+    		//$Ticket_TicketChangeStatusManager,
 
     		// users
     		// $Users_index,

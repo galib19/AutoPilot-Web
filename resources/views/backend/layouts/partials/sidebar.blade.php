@@ -35,6 +35,8 @@
           <i class="fa fa-dashboard"></i> <span>Dashboard</span>
         </a>
       </li>
+      <li><a href="{{ route('excel.import') }}"><i class="fa fa-book fa-fw"></i> Add Sites</a></li>
+      
       <li class="treeview">
         <a href="#">
           <i class="fa fa-pencil"></i>
@@ -44,11 +46,9 @@
           </span>
         </a>
         <ul class="treeview-menu">
-          <li><a href="{{ route('backend.case.index') }}"><i class="fa fa-circle-o"></i> All Tickets</a></li>
-          @if( Auth::user()->roles[0]->name == ('client') )
-              <li><a href="{{ route('backend.case.create') }}"><i class="fa fa-circle-o"></i> Add New</a></li>
-          @elseif( Auth::user()->roles[0]->name == ('admin') )
-          <li><a href="{{ route('backend.case.create') }}"><i class="fa fa-circle-o"></i> Add New</a></li>
+          <li><a href="{{ route('backend.ticket.index') }}"><i class="fa fa-circle-o"></i> All Tickets</a></li>
+          @if( check_user_permissions(request(), 'Ticket@create') )
+              <li><a href="{{ route('backend.ticket.create') }}"><i class="fa fa-circle-o"></i> Add New</a></li>
           @endif
         </ul>
       </li>
@@ -56,7 +56,7 @@
       @if( check_user_permissions(request(), 'Users@index') )
       <li class="treeview">
         <a href="#">
-          <i class="fa fa-users"></i>
+          <i class="fa fa-user fa-fw"></i>
           <span>Users</span>
           <span class="pull-right-container">
             <i class="fa fa-angle-left pull-right"></i>
@@ -71,7 +71,7 @@
       </li>
       @endif
       @if( check_user_permissions(request(), 'Settings@index') )
-      <li><a href="{{ route('backend.settings') }}"><i class="fa fa-folder"></i> <span>Settings</span></a></li>
+      <li><a href="{{ route('backend.settings') }}"><i class="fa fa-cog fa-fw"></i> <span>Settings</span></a></li>
       @endif
     </ul>
   </section>

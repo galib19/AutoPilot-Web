@@ -18,8 +18,12 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('phone')->unique();
             $table->string('email')->nullable();
+            $table->string('designation')->nullable();
+            $table->boolean('free')->default(1);
             $table->string('password');
             $table->boolean('active');
+            $table->dateTime('eta')->nullable();
+            $table->integer('ert')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->string('fcm_token')->nullable();

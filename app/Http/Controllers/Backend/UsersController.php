@@ -24,14 +24,6 @@ class UsersController extends BackendController
 {
 	protected $limit = 20;
 
-	
-	private function uploadFile(){
-
-		return $uploadFile = new uploadFile;
-	}
-
-	//private $uploadFile = new UploadFile;
-
     /**
      * Display a listing of the resource.
      *
@@ -53,29 +45,9 @@ class UsersController extends BackendController
     public function create(User $user)
     {
 
-    	$user_location = $this->get_option_value('user_location');
-
-        return view('backend.user.create', compact('user', 'user_location'));
+        return view('backend.user.create', compact('user'));
     }
 
-
-    // Get Option table value by key
-    private function get_option_value($option_name){
-
-    	if ( isset($option_name) && !empty($option_name) ) {
-
-    		$options_value = AsfOption::where('option_name', 'like', $option_name)->first(['option_value']);
-
-    		$option_data = unserialize($options_value->option_value);
-
-    		return $option_data;
-
-    	}
-    	else{
-    		return false;
-    	}
-
-    } 
 
     /**
      * Store a newly created resource in storage.
@@ -156,7 +128,7 @@ class UsersController extends BackendController
 	    	$data_user_meta = array();
 	    	$data_user_meta_final = array();
 
-	    	$data_other_field = $request->all(['designation', 'profile_pic', 'user_location']);
+	    	$data_other_field = $request->all(['designation', 'profile_pic']);
 
 	    	foreach ($data_other_field as $key => $value) {
 
@@ -214,10 +186,7 @@ class UsersController extends BackendController
 
         }
 
-        $all_location = $this->get_option_value('user_location');
-
-
-        return View::make('backend.user.show', ['user' => $user, 'usermeta' => $user_meta, 'all_location' => $all_location]);
+        return View::make('backend.user.show', ['user' => $user, 'usermeta' => $user_meta]);
     }
 
     /**
@@ -255,9 +224,7 @@ class UsersController extends BackendController
 
     	$user = (object)array_merge( $user->toArray(), $user_meta_data );
 
-    	$user_location = $this->get_option_value('user_location');
-
-        return view('backend.user.edit', compact('user', 'user_location'));
+        return view('backend.user.edit', compact('user'));
     }
 
     /**
@@ -276,14 +243,13 @@ class UsersController extends BackendController
         $validator = Validator::make($request->all(), [
             'name'        			=> 'required|string',
             'designation'        	=> 'string',
-            'user_location'        	=> 'string',
             'role'        			=> ['string', Rule::in(['manager', 'engineer', 'client'])],
             // 'phone'         		=> 'required|unique:users|regex:/(01)[0-9]{9}/|size:11',
             //'password'         		=> 'required',
             //'confirm_password'      => 'same:password',
             'email'  				=> 'email',
             'active'  				=> ['required', Rule::in(['1', '0'])],
-            'profile_pic'  			=> 'mimes:jpg,jpeg,bmp,png|max:10240',
+            //'profile_pic'  			=> 'mimes:jpg,jpeg,bmp,png|max:10240',
         ]);
 
 
